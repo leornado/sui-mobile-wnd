@@ -1,4 +1,4 @@
-;(function () {
+;(function ($) {
     'use strict';
 
     /**
@@ -238,7 +238,7 @@
         while(parent && (parent.tagName.toUpperCase() !== "BODY")) {
             if (parent.tagName.toUpperCase() === "LABEL") {
                 isCompositeLabel = true;
-                if ((/\bneedsclick\b/).test(parent.className)) return true;
+                return true;
             }
             parent = parent.parentNode;
         }
@@ -347,6 +347,10 @@
         var unsupportedType = ['date', 'time', 'month', 'number', 'email'];
         if (deviceIsIOS && targetElement.setSelectionRange && unsupportedType.indexOf(targetElement.type) === -1) {
             length = targetElement.value.length;
+            if($(this.targetElement).hasClass('no-fastclick')) {
+                targetElement.focus();
+                return;
+            }
             targetElement.setSelectionRange(length, length);
         } else {
             targetElement.focus();
@@ -556,8 +560,8 @@
         //修复安卓微信下，input type="date" 的bug，经测试date,time,month已没问题
         var unsupportedType = ['date', 'time', 'month'];
         if(unsupportedType.indexOf(event.target.type) !== -1){
-            　　　　return false;
-            　　}
+            return false;
+        }
         // Reset to prevent wrong click cancel on input (issue #156).
         this.cancelNextClick = false;
 
@@ -705,6 +709,9 @@
      */
     FastClick.prototype.onClick = function(event) {
         var permitted;
+        if($(this.targetElement).hasClass('no-fastclick')) {
+            return true;
+        }
 
         // It's possible for another FastClick-like library delivered with third-party code to fire a click event before FastClick does (issue #44). In that case, set the click-tracking flag back to false and return early. This will cause onTouchEnd to return early.
         if (this.trackingClick) {
@@ -852,4 +859,4 @@
     };
 
     window.FastClick = FastClick;
-}());
+}(Zepto));

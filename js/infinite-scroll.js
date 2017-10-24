@@ -33,10 +33,12 @@
 
     }
     $.attachInfiniteScroll = function(infiniteContent) {
-        $.getScroller(infiniteContent).on('scroll', handleInfiniteScroll);
+        var scroller = $.getScroller(infiniteContent);
+        scroller && scroller.on('scroll', handleInfiniteScroll);
     };
     $.detachInfiniteScroll = function(infiniteContent) {
-        $.getScroller(infiniteContent).off('scroll', handleInfiniteScroll);
+        var scroller = $.getScroller(infiniteContent);
+        scroller && scroller.off('scroll', handleInfiniteScroll);
     };
 
     $.initInfiniteScroll = function(pageContainer) {

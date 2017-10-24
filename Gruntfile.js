@@ -3,13 +3,13 @@
  */
 
 /* jshint node: true */
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     'use strict';
 
     // Force use of Unix newlines
     grunt.util.linefeed = '\n';
 
-    RegExp.quote = function(string) {
+    RegExp.quote = function (string) {
         return string.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
     };
 
@@ -45,34 +45,35 @@ module.exports = function(grunt) {
 
         concat: {
             sm: {
-              options: {
-                  banner: '<%= banner %>;$.smVersion = "<%= pkg.version %>";'
-              },
-              src: [
-                  'js/intro.js',
-                  'js/util.js',
-                  'js/zepto-adapter.js',
-                  'js/device.js',
-                  'js/fastclick.js',
-                  'js/modal.js',
-                  'js/calendar.js',
-                  'js/picker.js',
-                  'js/datetime-picker.js',
-                  'js/iscroll.js',
-                  'js/scroller.js',
-                  'js/tabs.js',
-                  'js/fixed-tab.js',
-                  'js/pull-to-refresh-js-scroll.js',
-                  'js/pull-to-refresh.js',
-                  'js/infinite-scroll.js',
-                  'js/searchbar.js',
-                  'js/panels.js',
-                  'js/router.js',
-                  'js/last-position.js',
-                  'js/init.js',
-                  'js/scroll-fix.js'
-              ],
-              dest: '<%= meta.distPath %>js/<%= pkg.name %>.js'
+                options: {
+                    banner: '<%= banner %>;$.smVersion = "<%= pkg.version %>";'
+                },
+                src: [
+                    'js/intro.js',
+                    'js/util.js',
+                    'js/zepto-adapter.js',
+                    'js/device.js',
+                    'js/fastclick.js',
+                    'js/modal.js',
+                    'js/calendar.js',
+                    'js/picker.js',
+                    'js/datetime-picker.js',
+                    'js/iscroll.js',
+                    'js/scroller.js',
+                    'js/tabs.js',
+                    'js/fixed-tab.js',
+                    'js/pull-to-refresh-js-scroll.js',
+                    'js/pull-to-refresh.js',
+                    'js/pull-to-load.js',
+                    'js/infinite-scroll.js',
+                    'js/searchbar.js',
+                    'js/panels.js',
+                    //'js/router.js',
+                    'js/last-position.js',
+                    'js/init.js',
+                    'js/scroll-fix.js'
+                ],
+                dest: '<%= meta.distPath %>js/<%= pkg.name %>.js'
             },
             extend: {
                 options: {
@@ -102,6 +103,10 @@ module.exports = function(grunt) {
             options: {
                 paths: ['./', '<%= meta.lessPath %>'],
                 ieCompat: false
+            },
+            'pull-to-load': {
+                src: '<%= meta.lessPath %>sm-wnd.less',
+                dest: '<%= meta.distPath %>css/<%= pkg.name %>-wnd.css'
             },
             core: {
                 src: '<%= meta.lessPath %>sm.less',
@@ -138,12 +143,12 @@ module.exports = function(grunt) {
 
         copy: {
             /*
-            fonts: {
-                expand: true,
-                src: 'fonts/*',
-                dest: '<%= meta.docsDistPath %>'
-            },
-            */
+             fonts: {
+             expand: true,
+             src: 'fonts/*',
+             dest: '<%= meta.docsDistPath %>'
+             },
+             */
             img: {
                 expand: true,
                 src: 'img/*',
