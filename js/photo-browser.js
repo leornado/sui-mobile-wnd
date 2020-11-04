@@ -26,10 +26,10 @@
 
         var toolbarTemplate = pb.params.toolbarTemplate ||
                             '<nav class="bar bar-tab">' +
-                              '<a class="tab-item photo-browser-prev" href="#">' +
+                              '<a class="tab-item photo-browser-prev" href="javascript:">' +
                                 '<i class="icon icon-prev"></i>' +
                               '</a>' +
-                              '<a class="tab-item photo-browser-next" href="#">' +
+                              '<a class="tab-item photo-browser-next" href="javascript:">' +
                                 '<i class="icon icon-next"></i>' +
                               '</a>' +
                             '</nav>';

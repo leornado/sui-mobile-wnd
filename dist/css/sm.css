@@ -4210,6 +4210,18 @@ body.panel-closing .page {
 .city-picker .col-district {
   width: 5rem;
 }
+.query-select-popup {
+  background: #efeff4;
+}
+.query-select-popup .searchbar .searchbar-cancel {
+  width: 1.2rem;
+}
+.query-select-popup .searchbar.searchbar-active .searchbar-cancel + .search-input {
+  margin-right: 1.5rem;
+}
+.query-select-popup .content-block-title.selected-count {
+  text-transform: none;
+}
 @font-face {
   font-family: "iconfont-sm";
   src: url('//at.alicdn.com/t/font_1433401008_2229297.woff') format('woff'), /* chrome、firefox */ url('//at.alicdn.com/t/font_1433401008_2229297.ttf') format('truetype'), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/ url('//at.alicdn.com/t/font_1433401008_2229297.svg#iconfont') format('svg');

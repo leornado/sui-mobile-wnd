@@ -25,16 +25,16 @@
             monthPicker: true,
             monthPickerTemplate:
                 '<div class="picker-calendar-month-picker">' +
-                '<a href="#" class="link icon-only picker-calendar-prev-month"><i class="icon icon-prev"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-prev-month"><i class="icon icon-prev"></i></a>' +
                 '<div class="current-month-value"></div>' +
-                '<a href="#" class="link icon-only picker-calendar-next-month"><i class="icon icon-next"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-next-month"><i class="icon icon-next"></i></a>' +
                 '</div>',
             yearPicker: true,
             yearPickerTemplate:
                 '<div class="picker-calendar-year-picker">' +
-                '<a href="#" class="link icon-only picker-calendar-prev-year"><i class="icon icon-prev"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-prev-year"><i class="icon icon-prev"></i></a>' +
                 '<span class="current-year-value"></span>' +
-                '<a href="#" class="link icon-only picker-calendar-next-year"><i class="icon icon-next"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-next-year"><i class="icon icon-next"></i></a>' +
                 '</div>',
             weekHeader: true,
             // Common settings
@@ -47,7 +47,7 @@
                 '<div class="toolbar-inner">' +
                 '{{monthPicker}}' +
                 '{{yearPicker}}' +
-                // '<a href="#" class="link close-picker">{{closeText}}</a>' +
+                // '<a href="javascript:" class="link close-picker">{{closeText}}</a>' +
                 '</div>' +
                 '</div>',
             /* Callbacks
@@ -331,7 +331,8 @@
                 dayIndex = 0 + (p.params.firstDay - 1),
                 today = new Date().setHours(0,0,0,0),
                 minDate = p.params.minDate ? new Date(p.params.minDate).getTime() : null,
-                maxDate = p.params.maxDate ? new Date(p.params.maxDate).getTime() : null;
+                maxDate = p.params.maxDate ? new Date(p.params.maxDate).getTime() : null,
+                isDateDisabled = p.params.isDateDisabled;
 
             if (p.value && p.value.length) {
                 for (i = 0; i < p.value.length; i++) {
@@ -372,7 +373,7 @@
                         addClass += ' picker-calendar-day-weekend';
                     }
                     // Disabled
-                    if ((minDate && dayDate < minDate) || (maxDate && dayDate > maxDate)) {
+                    if ((minDate && dayDate < minDate) || (maxDate && dayDate > maxDate) || isDateDisabled && isDateDisabled(dayDate)) {
                         addClass += ' picker-calendar-day-disabled';
                     }
 
@@ -811,7 +812,8 @@
             } else {
                 p.container = $this;
             }
-            new Calendar($.extend(p, params));
+            var c = new Calendar($.extend(p, params));
+            $this.data('calendar', c);
         });
     };
 

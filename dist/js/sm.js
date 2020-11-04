@@ -19,31 +19,146 @@
 
 }(Zepto);
 
-+ function($) {
-    "use strict";
++function ($) {
+  "use strict";
 
-    //比较一个字符串版本号
-    //a > b === 1
-    //a = b === 0
-    //a < b === -1
-    $.compareVersion = function(a, b) {
-        var as = a.split('.');
-        var bs = b.split('.');
-        if (a === b) return 0;
+  //比较一个字符串版本号
+  //a > b === 1
+  //a = b === 0
+  //a < b === -1
+  $.compareVersion = function (a, b) {
+    var as = a.split('.');
+    var bs = b.split('.');
+    if (a === b) return 0;
 
-        for (var i = 0; i < as.length; i++) {
-            var x = parseInt(as[i]);
-            if (!bs[i]) return 1;
-            var y = parseInt(bs[i]);
-            if (x < y) return -1;
-            if (x > y) return 1;
+    for (var i = 0; i < as.length; i++) {
+      var x = parseInt(as[i]);
+      if (!bs[i]) return 1;
+      var y = parseInt(bs[i]);
+      if (x < y) return -1;
+      if (x > y) return 1;
+    }
+    return -1;
+  };
+
+  $.getCurrentPage = function () {
+    return $(".page-current")[0] || $(".page")[0] || document.body;
+  };
+
+  $.sui = {};
+
+  $.sui.enHtml = function (value) {
+    return !value ? '' : String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/>/g, "&gt;")
+      .replace(/</g, "&lt;")
+      .replace(/"/g, "&quot;");
+  };
+
+  $.sui.enJs = function (string) {
+    return !string ? '' : ('' + string)
+      .replace(/["'\\\n\r\u2028\u2029]/g, function (character) {
+        switch (character) {
+          case '"':
+          case "'":
+          case '\\':
+            return '\\' + character;
+          case '\n':
+            return '\\n';
+          case '\r':
+            return '\\r';
+          case '\u2028':
+            return '\\u2028';
+          case '\u2029':
+            return '\\u2029'
         }
-        return -1;
+      })
+  };
+
+  $.sui.isNumber = function (value) {
+    return typeof value === 'number';
+  };
+
+  $.sui.isUndefined = function (value) {
+    return typeof value === 'undefined';
+  };
+
+  $.sui.isDefined = function (value) {
+    return typeof value !== 'undefined';
+  };
+
+  $.sui.orderedMap = function () {
+    var keys = [], vals = [], map = {};
+    var _this = this;
+
+    this.map = function () {
+      return $.extend({}, map);
     };
 
-    $.getCurrentPage = function() {
-        return $(".page-current")[0] || $(".page")[0] || document.body;
+    this.size = function () {
+      return keys.length;
     };
+
+    this.containsKey = function (k) {
+      return k in map;
+    };
+
+    this.clear = function () {
+      keys.splice(0, keys.length), vals.splice(0, vals.length);
+      for (var k in map) delete map[k];
+    };
+
+    this.keys = function () {
+      return keys.slice();
+    };
+
+    this.vals = function () {
+      return vals.slice();
+    };
+
+    this.put = function (k, v) {
+      if (k === undefined || k === null) return;
+      if (k in map) {
+        map[k] = v;
+        return;
+      }
+
+      map[k] = v;
+      keys.push(k);
+      vals.push(v);
+    };
+
+    this.get = function (k) {
+      if (k === undefined || k == null) return;
+      return map[k] ? map[k] : undefined;
+    };
+
+    this.getAt = function (index) {
+      if (index >= keys.length) return;
+      return vals[index];
+    };
+
+    this.remove = function (k) {
+      if (k === undefined || k == null) return;
+      if (!_this.containsKey(k)) return;
+
+      var idx = keys.indexOf(k);
+      if (idx >= 0) {
+        keys.splice(idx, 1);
+        vals.splice(idx, 1);
+        var v = map[k];
+        delete map[k];
+        return v;
+      }
+    };
+
+    this.removeAt = function (index) {
+      if (index >= keys.length) return;
+
+      var k = keys[index];
+      return _this.remove(k);
+    }
+  };
 
 }(Zepto);
 
@@ -1739,16 +1854,16 @@ Device/OS Detection
             monthPicker: true,
             monthPickerTemplate:
                 '<div class="picker-calendar-month-picker">' +
-                '<a href="#" class="link icon-only picker-calendar-prev-month"><i class="icon icon-prev"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-prev-month"><i class="icon icon-prev"></i></a>' +
                 '<div class="current-month-value"></div>' +
-                '<a href="#" class="link icon-only picker-calendar-next-month"><i class="icon icon-next"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-next-month"><i class="icon icon-next"></i></a>' +
                 '</div>',
             yearPicker: true,
             yearPickerTemplate:
                 '<div class="picker-calendar-year-picker">' +
-                '<a href="#" class="link icon-only picker-calendar-prev-year"><i class="icon icon-prev"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-prev-year"><i class="icon icon-prev"></i></a>' +
                 '<span class="current-year-value"></span>' +
-                '<a href="#" class="link icon-only picker-calendar-next-year"><i class="icon icon-next"></i></a>' +
+                '<a href="javascript:" class="link icon-only picker-calendar-next-year"><i class="icon icon-next"></i></a>' +
                 '</div>',
             weekHeader: true,
             // Common settings
@@ -1761,7 +1876,7 @@ Device/OS Detection
                 '<div class="toolbar-inner">' +
                 '{{monthPicker}}' +
                 '{{yearPicker}}' +
-                // '<a href="#" class="link close-picker">{{closeText}}</a>' +
+                // '<a href="javascript:" class="link close-picker">{{closeText}}</a>' +
                 '</div>' +
                 '</div>',
             /* Callbacks
@@ -2045,7 +2160,8 @@ Device/OS Detection
                 dayIndex = 0 + (p.params.firstDay - 1),
                 today = new Date().setHours(0,0,0,0),
                 minDate = p.params.minDate ? new Date(p.params.minDate).getTime() : null,
-                maxDate = p.params.maxDate ? new Date(p.params.maxDate).getTime() : null;
+                maxDate = p.params.maxDate ? new Date(p.params.maxDate).getTime() : null,
+                isDateDisabled = p.params.isDateDisabled;
 
             if (p.value && p.value.length) {
                 for (i = 0; i < p.value.length; i++) {
@@ -2086,7 +2202,7 @@ Device/OS Detection
                         addClass += ' picker-calendar-day-weekend';
                     }
                     // Disabled
-                    if ((minDate && dayDate < minDate) || (maxDate && dayDate > maxDate)) {
+                    if ((minDate && dayDate < minDate) || (maxDate && dayDate > maxDate) || isDateDisabled && isDateDisabled(dayDate)) {
                         addClass += ' picker-calendar-day-disabled';
                     }
 
@@ -2525,7 +2641,8 @@ Device/OS Detection
             } else {
                 p.container = $this;
             }
-            new Calendar($.extend(p, params));
+            var c = new Calendar($.extend(p, params));
+            $this.data('calendar', c);
         });
     };
 
@@ -2538,695 +2655,1545 @@ Device/OS Detection
 }(Zepto);
 
 /*======================================================
-************   Picker   ************
-======================================================*/
+ ************   Picker   ************
+ ======================================================*/
 /* jshint unused:false */
 /* jshint multistr:true */
-+ function($) {
-    "use strict";
-    var Picker = function (params) {
-        var p = this;
-        var defaults = {
-            updateValuesOnMomentum: false,
-            updateValuesOnTouchmove: true,
-            rotateEffect: false,
-            momentumRatio: 7,
-            freeMode: false,
-            // Common settings
-            scrollToInput: true,
-            inputReadOnly: true,
-            toolbar: true,
-            toolbarCloseText: '确定',
-            toolbarTemplate: '<header class="bar bar-nav">\
++function ($) {
+  "use strict";
+  var Picker = function (params) {
+    var p = this;
+    var defaults = {
+      splitChar: ' ',
+      updateValuesOnMomentum: false,
+      updateValuesOnTouchmove: true,
+      rotateEffect: false,
+      momentumRatio: 7,
+      freeMode: false,
+      // Common settings
+      scrollToInput: true,
+      inputReadOnly: true,
+      toolbar: true,
+      toolbarCloseText: '确定',
+      colsCfg: [],
+      toolbarTemplate: '<header class="bar bar-nav">\
                 <button class="button button-link pull-right close-picker">确定</button>\
                 <h1 class="title">请选择</h1>\
                 </header>',
-        };
-        params = params || {};
-        for (var def in defaults) {
-            if (typeof params[def] === 'undefined') {
-                params[def] = defaults[def];
+    };
+    params = params || {};
+    for (var def in defaults) {
+      if (typeof params[def] === 'undefined') {
+        params[def] = defaults[def];
+      }
+    }
+    p.params = params;
+    p.cols = [];
+    p.initialized = false;
+
+    if (p.params.treeCols) {
+      var levelCount = p.params.dataLevel, dataLvl = 0, isSpecifyLevelCount = $.sui.isNumber(levelCount);
+      var topCol = {values: [], displayValues: []};
+      p.params.cols = [], p.colMaps = {cols: {}, col: topCol, originData: p.params.treeCols}, p.isLinkage = true;
+
+      var convertData2Col = function (level, data, parent) {
+        dataLvl = Math.max(level, dataLvl);
+        if (isSpecifyLevelCount && level > levelCount) return;
+
+        parent.col.onChange = function (picker, value, displayValue) {
+          var lastValue = value, lastColMap = parent;
+          for (var l = level; l < p.maxLevel; l++) {
+            if (p.cols[l].replaceValues) {
+              var changeCol = lastColMap = lastColMap.cols[lastValue];
+              p.cols[l].onChange = changeCol.col.onChange;
+              p.cols[l].replaceValues(changeCol.col.values.concat(), changeCol.col.displayValues.concat());
+              p.resetColVisible(p.cols[l]);
+              lastValue = changeCol.col.values[0];
             }
+          }
+          picker.updateValue();
+          if (parent.originData.onChange) parent.originData.onChange(p, p.value, p.displayValue);
+        };
+
+        $.each(data, function (i, item) {
+          var itemCode = item.code || item.c, itemName = item.name || item.n, itemData = item.data || item.d;
+          parent.col.values.push(itemCode);
+          parent.col.displayValues.push(itemName || itemCode);
+          if (itemData && itemData.length > 0) {
+            var itemColMap = parent.cols[itemCode] =
+            {cols: {}, col: {values: [], displayValues: [], textAlign: 'center'}, originData: item};
+            convertData2Col(level + 1, itemData, itemColMap);
+          } else if (isSpecifyLevelCount && level < levelCount) {
+            parent.cols[itemCode] = {
+              cols: {}, originData: item,
+              col: {values: [''], displayValues: [p.params.emptyDisp || ''], textAlign: 'center'}
+            };
+          }
+        });
+      };
+
+      var fillEmptyCols = function (level, parent) {
+        if (level >= p.maxLevel) return;
+
+        $.each(parent.col.values, function (i, code) {
+          if (!parent.cols[code]) {
+            parent.cols[code] = {
+              cols: {}, col: {values: [''], displayValues: [p.params.emptyDisp || ''], textAlign: 'center'}
+            };
+          }
+          fillEmptyCols(level + 1, parent.cols[code]);
+        });
+      };
+
+      convertData2Col(1, p.params.treeCols, p.colMaps);
+
+      var lastColMap = p.colMaps, maxLvl = p.maxLevel = isSpecifyLevelCount ? levelCount : dataLvl;
+      fillEmptyCols(1, p.colMaps);
+
+      for (var i = 0; i < maxLvl; i++) {
+        if (lastColMap) {
+          var lastCol = lastColMap.col;
+          if (lastCol && lastCol.values && lastCol.values.length > 0) {
+            p.params.cols.push({
+              values: lastCol.values.concat(),
+              displayValues: lastCol.displayValues.concat(),
+              onChange: lastCol.onChange
+            });
+            lastColMap = lastColMap.cols[lastCol.values[0]];
+          }
+        } else {
+          p.params.cols.push({values: [], displayValues: []});
         }
-        p.params = params;
-        p.cols = [];
-        p.initialized = false;
+      }
+    }
 
-        // Inline flag
-        p.inline = p.params.container ? true : false;
+    // Inline flag
+    p.inline = p.params.container ? true : false;
 
-        // 3D Transforms origin bug, only on safari
-        var originBug = $.device.ios || (navigator.userAgent.toLowerCase().indexOf('safari') >= 0 && navigator.userAgent.toLowerCase().indexOf('chrome') < 0) && !$.device.android;
+    // 3D Transforms origin bug, only on safari
+    var originBug = $.device.ios || (navigator.userAgent.toLowerCase().indexOf('safari') >= 0 && navigator.userAgent.toLowerCase().indexOf('chrome') < 0) && !$.device.android;
 
-        // Value
-        p.setValue = function (arrValues, transition) {
-            var valueIndex = 0;
-            for (var i = 0; i < p.cols.length; i++) {
-                if (p.cols[i] && !p.cols[i].divider) {
-                    p.cols[i].setValue(arrValues[valueIndex], transition);
-                    valueIndex++;
-                }
-            }
-        };
-        p.updateValue = function () {
-            var newValue = [];
-            var newDisplayValue = [];
-            for (var i = 0; i < p.cols.length; i++) {
-                if (!p.cols[i].divider) {
-                    newValue.push(p.cols[i].value);
-                    newDisplayValue.push(p.cols[i].displayValue);
-                }
-            }
-            if (newValue.indexOf(undefined) >= 0) {
-                return;
-            }
-            p.value = newValue;
-            p.displayValue = newDisplayValue;
-            if (p.params.onChange) {
-                p.params.onChange(p, p.value, p.displayValue);
-            }
-            if (p.input && p.input.length > 0) {
-                $(p.input).val(p.params.formatValue ? p.params.formatValue(p, p.value, p.displayValue) : p.value.join(' '));
-                $(p.input).trigger('change');
-            }
-        };
-
-        // Columns Handlers
-        p.initPickerCol = function (colElement, updateItems) {
-            var colContainer = $(colElement);
-            var colIndex = colContainer.index();
-            var col = p.cols[colIndex];
-            if (col.divider) return;
-            col.container = colContainer;
-            col.wrapper = col.container.find('.picker-items-col-wrapper');
-            col.items = col.wrapper.find('.picker-item');
-
-            var i, j;
-            var wrapperHeight, itemHeight, itemsHeight, minTranslate, maxTranslate;
-            col.replaceValues = function (values, displayValues) {
-                col.destroyEvents();
-                col.values = values;
-                col.displayValues = displayValues;
-                var newItemsHTML = p.columnHTML(col, true);
-                col.wrapper.html(newItemsHTML);
-                col.items = col.wrapper.find('.picker-item');
-                col.calcSize();
-                col.setValue(col.values[0], 0, true);
-                col.initEvents();
-            };
-            col.calcSize = function () {
-                if (p.params.rotateEffect) {
-                    col.container.removeClass('picker-items-col-absolute');
-                    if (!col.width) col.container.css({width:''});
-                }
-                var colWidth, colHeight;
-                colWidth = 0;
-                colHeight = col.container[0].offsetHeight;
-                wrapperHeight = col.wrapper[0].offsetHeight;
-                itemHeight = col.items[0].offsetHeight;
-                itemsHeight = itemHeight * col.items.length;
-                minTranslate = colHeight / 2 - itemsHeight + itemHeight / 2;
-                maxTranslate = colHeight / 2 - itemHeight / 2;
-                if (col.width) {
-                    colWidth = col.width;
-                    if (parseInt(colWidth, 10) === colWidth) colWidth = colWidth + 'px';
-                    col.container.css({width: colWidth});
-                }
-                if (p.params.rotateEffect) {
-                    if (!col.width) {
-                        col.items.each(function () {
-                            var item = $(this);
-                            item.css({width:'auto'});
-                            colWidth = Math.max(colWidth, item[0].offsetWidth);
-                            item.css({width:''});
-                        });
-                        col.container.css({width: (colWidth + 2) + 'px'});
-                    }
-                    col.container.addClass('picker-items-col-absolute');
-                }
-            };
-            col.calcSize();
-
-            col.wrapper.transform('translate3d(0,' + maxTranslate + 'px,0)').transition(0);
-
-
-            var activeIndex = 0;
-            var animationFrameId;
-
-            // Set Value Function
-            col.setValue = function (newValue, transition, valueCallbacks) {
-                if (typeof transition === 'undefined') transition = '';
-                var newActiveIndex = col.wrapper.find('.picker-item[data-picker-value="' + newValue + '"]').index();
-                if(typeof newActiveIndex === 'undefined' || newActiveIndex === -1) {
-                    return;
-                }
-                var newTranslate = -newActiveIndex * itemHeight + maxTranslate;
-                // Update wrapper
-                col.wrapper.transition(transition);
-                col.wrapper.transform('translate3d(0,' + (newTranslate) + 'px,0)');
-
-                // Watch items
-                if (p.params.updateValuesOnMomentum && col.activeIndex && col.activeIndex !== newActiveIndex ) {
-                    $.cancelAnimationFrame(animationFrameId);
-                    col.wrapper.transitionEnd(function(){
-                        $.cancelAnimationFrame(animationFrameId);
-                    });
-                    updateDuringScroll();
-                }
-
-                // Update items
-                col.updateItems(newActiveIndex, newTranslate, transition, valueCallbacks);
-            };
-
-            col.updateItems = function (activeIndex, translate, transition, valueCallbacks) {
-                if (typeof translate === 'undefined') {
-                    translate = $.getTranslate(col.wrapper[0], 'y');
-                }
-                if(typeof activeIndex === 'undefined') activeIndex = -Math.round((translate - maxTranslate)/itemHeight);
-                if (activeIndex < 0) activeIndex = 0;
-                if (activeIndex >= col.items.length) activeIndex = col.items.length - 1;
-                var previousActiveIndex = col.activeIndex;
-                col.activeIndex = activeIndex;
-                /*
-                   col.wrapper.find('.picker-selected, .picker-after-selected, .picker-before-selected').removeClass('picker-selected picker-after-selected picker-before-selected');
-
-                   col.items.transition(transition);
-                   var selectedItem = col.items.eq(activeIndex).addClass('picker-selected').transform('');
-                   var prevItems = selectedItem.prevAll().addClass('picker-before-selected');
-                   var nextItems = selectedItem.nextAll().addClass('picker-after-selected');
-                   */
-                //去掉 .picker-after-selected, .picker-before-selected 以提高性能
-                col.wrapper.find('.picker-selected').removeClass('picker-selected');
-                if (p.params.rotateEffect) {
-                    col.items.transition(transition);
-                }
-                var selectedItem = col.items.eq(activeIndex).addClass('picker-selected').transform('');
-
-                if (valueCallbacks || typeof valueCallbacks === 'undefined') {
-                    // Update values
-                    col.value = selectedItem.attr('data-picker-value');
-                    col.displayValue = col.displayValues ? col.displayValues[activeIndex] : col.value;
-                    // On change callback
-                    if (previousActiveIndex !== activeIndex) {
-                        if (col.onChange) {
-                            col.onChange(p, col.value, col.displayValue);
-                        }
-                        p.updateValue();
-                    }
-                }
-
-                // Set 3D rotate effect
-                if (!p.params.rotateEffect) {
-                    return;
-                }
-                var percentage = (translate - (Math.floor((translate - maxTranslate)/itemHeight) * itemHeight + maxTranslate)) / itemHeight;
-
-                col.items.each(function () {
-                    var item = $(this);
-                    var itemOffsetTop = item.index() * itemHeight;
-                    var translateOffset = maxTranslate - translate;
-                    var itemOffset = itemOffsetTop - translateOffset;
-                    var percentage = itemOffset / itemHeight;
-
-                    var itemsFit = Math.ceil(col.height / itemHeight / 2) + 1;
-
-                    var angle = (-18*percentage);
-                    if (angle > 180) angle = 180;
-                    if (angle < -180) angle = -180;
-                    // Far class
-                    if (Math.abs(percentage) > itemsFit) item.addClass('picker-item-far');
-                    else item.removeClass('picker-item-far');
-                    // Set transform
-                    item.transform('translate3d(0, ' + (-translate + maxTranslate) + 'px, ' + (originBug ? -110 : 0) + 'px) rotateX(' + angle + 'deg)');
-                });
-            };
-
-            function updateDuringScroll() {
-                animationFrameId = $.requestAnimationFrame(function () {
-                    col.updateItems(undefined, undefined, 0);
-                    updateDuringScroll();
-                });
-            }
-
-            // Update items on init
-            if (updateItems) col.updateItems(0, maxTranslate, 0);
-
-            var allowItemClick = true;
-            var isTouched, isMoved, touchStartY, touchCurrentY, touchStartTime, touchEndTime, startTranslate, returnTo, currentTranslate, prevTranslate, velocityTranslate, velocityTime;
-            function handleTouchStart (e) {
-                if (isMoved || isTouched) return;
-                e.preventDefault();
-                isTouched = true;
-                touchStartY = touchCurrentY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
-                touchStartTime = (new Date()).getTime();
-
-                allowItemClick = true;
-                startTranslate = currentTranslate = $.getTranslate(col.wrapper[0], 'y');
-            }
-            function handleTouchMove (e) {
-                if (!isTouched) return;
-                e.preventDefault();
-                allowItemClick = false;
-                touchCurrentY = e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY;
-                if (!isMoved) {
-                    // First move
-                    $.cancelAnimationFrame(animationFrameId);
-                    isMoved = true;
-                    startTranslate = currentTranslate = $.getTranslate(col.wrapper[0], 'y');
-                    col.wrapper.transition(0);
-                }
-                e.preventDefault();
-
-                var diff = touchCurrentY - touchStartY;
-                currentTranslate = startTranslate + diff;
-                returnTo = undefined;
-
-                // Normalize translate
-                if (currentTranslate < minTranslate) {
-                    currentTranslate = minTranslate - Math.pow(minTranslate - currentTranslate, 0.8);
-                    returnTo = 'min';
-                }
-                if (currentTranslate > maxTranslate) {
-                    currentTranslate = maxTranslate + Math.pow(currentTranslate - maxTranslate, 0.8);
-                    returnTo = 'max';
-                }
-                // Transform wrapper
-                col.wrapper.transform('translate3d(0,' + currentTranslate + 'px,0)');
-
-                // Update items
-                col.updateItems(undefined, currentTranslate, 0, p.params.updateValuesOnTouchmove);
-
-                // Calc velocity
-                velocityTranslate = currentTranslate - prevTranslate || currentTranslate;
-                velocityTime = (new Date()).getTime();
-                prevTranslate = currentTranslate;
-            }
-            function handleTouchEnd (e) {
-                if (!isTouched || !isMoved) {
-                    isTouched = isMoved = false;
-                    return;
-                }
-                isTouched = isMoved = false;
-                col.wrapper.transition('');
-                if (returnTo) {
-                    if (returnTo === 'min') {
-                        col.wrapper.transform('translate3d(0,' + minTranslate + 'px,0)');
-                    }
-                    else col.wrapper.transform('translate3d(0,' + maxTranslate + 'px,0)');
-                }
-                touchEndTime = new Date().getTime();
-                var velocity, newTranslate;
-                if (touchEndTime - touchStartTime > 300) {
-                    newTranslate = currentTranslate;
-                }
-                else {
-                    velocity = Math.abs(velocityTranslate / (touchEndTime - velocityTime));
-                    newTranslate = currentTranslate + velocityTranslate * p.params.momentumRatio;
-                }
-
-                newTranslate = Math.max(Math.min(newTranslate, maxTranslate), minTranslate);
-
-                // Active Index
-                var activeIndex = -Math.floor((newTranslate - maxTranslate)/itemHeight);
-
-                // Normalize translate
-                if (!p.params.freeMode) newTranslate = -activeIndex * itemHeight + maxTranslate;
-
-                // Transform wrapper
-                col.wrapper.transform('translate3d(0,' + (parseInt(newTranslate,10)) + 'px,0)');
-
-                // Update items
-                col.updateItems(activeIndex, newTranslate, '', true);
-
-                // Watch items
-                if (p.params.updateValuesOnMomentum) {
-                    updateDuringScroll();
-                    col.wrapper.transitionEnd(function(){
-                        $.cancelAnimationFrame(animationFrameId);
-                    });
-                }
-
-                // Allow click
-                setTimeout(function () {
-                    allowItemClick = true;
-                }, 100);
-            }
-
-            function handleClick(e) {
-                if (!allowItemClick) return;
-                $.cancelAnimationFrame(animationFrameId);
-                /*jshint validthis:true */
-                var value = $(this).attr('data-picker-value');
-                col.setValue(value);
-            }
-
-            col.initEvents = function (detach) {
-                var method = detach ? 'off' : 'on';
-                col.container[method]($.touchEvents.start, handleTouchStart);
-                col.container[method]($.touchEvents.move, handleTouchMove);
-                col.container[method]($.touchEvents.end, handleTouchEnd);
-                col.items[method]('click', handleClick);
-            };
-            col.destroyEvents = function () {
-                col.initEvents(true);
-            };
-
-            col.container[0].f7DestroyPickerCol = function () {
-                col.destroyEvents();
-            };
-
-            col.initEvents();
-
-        };
-        p.destroyPickerCol = function (colContainer) {
-            colContainer = $(colContainer);
-            if ('f7DestroyPickerCol' in colContainer[0]) colContainer[0].f7DestroyPickerCol();
-        };
-        // Resize cols
-        function resizeCols() {
-            if (!p.opened) return;
-            for (var i = 0; i < p.cols.length; i++) {
-                if (!p.cols[i].divider) {
-                    p.cols[i].calcSize();
-                    p.cols[i].setValue(p.cols[i].value, 0, false);
-                }
-            }
+    // Value
+    p.setValue = function (arrValues, transition) {
+      var valueIndex = 0;
+      for (var i = 0; i < p.cols.length; i++) {
+        if (p.cols[i] && !p.cols[i].divider) {
+          p.cols[i].setValue(arrValues[valueIndex], transition);
+          valueIndex++;
         }
-        $(window).on('resize', resizeCols);
-
-        // HTML Layout
-        p.columnHTML = function (col, onlyItems) {
-            var columnItemsHTML = '';
-            var columnHTML = '';
-            if (col.divider) {
-                columnHTML += '<div class="picker-items-col picker-items-col-divider ' + (col.textAlign ? 'picker-items-col-' + col.textAlign : '') + ' ' + (col.cssClass || '') + '">' + col.content + '</div>';
-            }
-            else {
-                for (var j = 0; j < col.values.length; j++) {
-                    columnItemsHTML += '<div class="picker-item" data-picker-value="' + col.values[j] + '">' + (col.displayValues ? col.displayValues[j] : col.values[j]) + '</div>';
-                }
-
-                columnHTML += '<div class="picker-items-col ' + (col.textAlign ? 'picker-items-col-' + col.textAlign : '') + ' ' + (col.cssClass || '') + '"><div class="picker-items-col-wrapper">' + columnItemsHTML + '</div></div>';
-            }
-            return onlyItems ? columnItemsHTML : columnHTML;
-        };
-        p.layout = function () {
-            var pickerHTML = '';
-            var pickerClass = '';
-            var i;
-            p.cols = [];
-            var colsHTML = '';
-            for (i = 0; i < p.params.cols.length; i++) {
-                var col = p.params.cols[i];
-                colsHTML += p.columnHTML(p.params.cols[i]);
-                p.cols.push(col);
-            }
-            pickerClass = 'picker-modal picker-columns ' + (p.params.cssClass || '') + (p.params.rotateEffect ? ' picker-3d' : '');
-            pickerHTML =
-                '<div class="' + (pickerClass) + '">' +
-                (p.params.toolbar ? p.params.toolbarTemplate.replace(/{{closeText}}/g, p.params.toolbarCloseText) : '') +
-                '<div class="picker-modal-inner picker-items">' +
-                colsHTML +
-                '<div class="picker-center-highlight"></div>' +
-                '</div>' +
-                '</div>';
-
-            p.pickerHTML = pickerHTML;
-        };
-
-        // Input Events
-        function openOnInput(e) {
-            e.preventDefault();
-            // 安卓微信webviewreadonly的input依然弹出软键盘问题修复
-            if ($.device.isWeixin && $.device.android && p.params.inputReadOnly) {
-                /*jshint validthis:true */
-                this.focus();
-                this.blur();
-            }
-            if (p.opened) return;
-            p.open();
-            if (p.params.scrollToInput) {
-                var pageContent = p.input.parents('.content');
-                if (pageContent.length === 0) return;
-
-                var paddingTop = parseInt(pageContent.css('padding-top'), 10),
-                    paddingBottom = parseInt(pageContent.css('padding-bottom'), 10),
-                    pageHeight = pageContent[0].offsetHeight - paddingTop - p.container.height(),
-                    pageScrollHeight = pageContent[0].scrollHeight - paddingTop - p.container.height(),
-                    newPaddingBottom;
-                var inputTop = p.input.offset().top - paddingTop + p.input[0].offsetHeight;
-                if (inputTop > pageHeight) {
-                    var scrollTop = pageContent.scrollTop() + inputTop - pageHeight;
-                    if (scrollTop + pageHeight > pageScrollHeight) {
-                        newPaddingBottom = scrollTop + pageHeight - pageScrollHeight + paddingBottom;
-                        if (pageHeight === pageScrollHeight) {
-                            newPaddingBottom = p.container.height();
-                        }
-                        pageContent.css({'padding-bottom': (newPaddingBottom) + 'px'});
-                    }
-                    pageContent.scrollTop(scrollTop, 300);
-                }
-            }
+      }
+    };
+    p.updateValue = function (clear) {
+      var newValue = [];
+      var newDisplayValue = [];
+      for (var i = 0; i < p.cols.length; i++) {
+        if (!p.cols[i].divider) {
+          newValue.push(p.cols[i].value);
+          newDisplayValue.push(p.cols[i].displayValue);
         }
-        function closeOnHTMLClick(e) {
-            if (!p.opened) return;
-            if (p.input && p.input.length > 0) {
-                if (e.target !== p.input[0] && $(e.target).parents('.picker-modal').length === 0) p.close();
-            }
-            else {
-                if ($(e.target).parents('.picker-modal').length === 0) p.close();
-            }
+      }
+      if (newValue.indexOf(undefined) >= 0) {
+        return;
+      }
+      var oldValue = p.value, oldDisplayValue = p.displayValue;
+      ;
+      p.value = clear ? [] : newValue;
+      p.displayValue = clear ? [] : newDisplayValue;
+      if (p.params.onChange) {
+        p.params.onChange(p, p.value, p.displayValue, oldValue, oldDisplayValue);
+      }
+      if (p.input && p.input.length > 0) {
+        $(p.input).val(p.params.formatValue ? p.params.formatValue(p, p.value, p.displayValue) : p.value.join(p.params.splitChar));
+        $(p.input).trigger('change');
+      }
+    };
+
+    p.resetColVisible = function (col) {
+      if (col.values.length == 1 && (col.displayValues && col.displayValues.length == 1 && !col.displayValues[0]
+        || col.values.length.length == 1 && !col.values[0]))
+        return col.container.hide();
+      col.container.css('display', '')
+    };
+
+    // Columns Handlers
+    p.initPickerCol = function (colElement, updateItems) {
+      var colContainer = $(colElement);
+      var colIndex = colContainer.index();
+      var col = p.cols[colIndex];
+      if (col.divider) return;
+      col.container = colContainer;
+      col.wrapper = col.container.find('.picker-items-col-wrapper');
+      col.items = col.wrapper.find('.picker-item');
+
+      var i, j;
+      var wrapperHeight, itemHeight, itemsHeight, minTranslate, maxTranslate;
+      col.replaceValues = function (values, displayValues) {
+        col.destroyEvents();
+        col.values = values;
+        col.displayValues = displayValues;
+        var newItemsHTML = p.columnHTML(col, true);
+        col.wrapper.html(newItemsHTML);
+        col.items = col.wrapper.find('.picker-item');
+        col.calcSize();
+        col.setValue(col.values[0], 0, true);
+        col.initEvents();
+      };
+      col.calcSize = function () {
+        p.resetColVisible(col);
+        if (p.params.rotateEffect) {
+          col.container.removeClass('picker-items-col-absolute');
+          if (!col.width) col.container.css({width: ''});
+        }
+        var colWidth, colHeight;
+        colWidth = 0;
+        colHeight = col.container[0].offsetHeight;
+        wrapperHeight = col.wrapper[0].offsetHeight;
+        itemHeight = col.items[0].offsetHeight;
+        itemsHeight = itemHeight * col.items.length;
+        minTranslate = colHeight / 2 - itemsHeight + itemHeight / 2;
+        maxTranslate = col.maxTranslate = colHeight / 2 - itemHeight / 2;
+        if (col.width) {
+          colWidth = col.width;
+          if (parseInt(colWidth, 10) === colWidth) colWidth = colWidth + 'px';
+          col.container.css({width: colWidth});
+        }
+        if (p.params.rotateEffect) {
+          if (!col.width) {
+            col.items.each(function () {
+              var item = $(this);
+              item.css({width: 'auto'});
+              colWidth = Math.max(colWidth, item[0].offsetWidth);
+              item.css({width: ''});
+            });
+            col.container.css({width: (colWidth + 2) + 'px'});
+          }
+          col.container.addClass('picker-items-col-absolute');
+        }
+      };
+      col.calcSize();
+
+      col.wrapper.transform('translate3d(0,' + maxTranslate + 'px,0)').transition(0);
+
+
+      var activeIndex = 0;
+      var animationFrameId;
+
+      // Set Value Function
+      col.setValue = function (newValue, transition, valueCallbacks, clear) {
+        if (typeof transition === 'undefined') transition = '';
+        var newActiveIndex = clear ? 0 : col.wrapper.find('.picker-item[data-picker-value="' + $.sui.enJs(newValue) + '"]').index();
+        if (typeof newActiveIndex === 'undefined' || newActiveIndex === -1) {
+          return;
+        }
+        var newTranslate = -newActiveIndex * itemHeight + maxTranslate;
+        // Update wrapper
+        col.wrapper.transition(transition);
+        col.wrapper.transform('translate3d(0,' + (newTranslate) + 'px,0)');
+
+        // Watch items
+        if (p.params.updateValuesOnMomentum && col.activeIndex && col.activeIndex !== newActiveIndex) {
+          $.cancelAnimationFrame(animationFrameId);
+          col.wrapper.transitionEnd(function () {
+            $.cancelAnimationFrame(animationFrameId);
+          });
+          updateDuringScroll();
         }
 
-        if (p.params.input) {
-            p.input = $(p.params.input);
-            if (p.input.length > 0) {
-                if (p.params.inputReadOnly) p.input.prop('readOnly', true);
-                if (!p.inline) {
-                    p.input.on('click', openOnInput);
-                }
+        // Update items
+        col.updateItems(newActiveIndex, newTranslate, transition, valueCallbacks, clear);
+      };
+
+      col.updateItems = function (activeIndex, translate, transition, valueCallbacks, clear) {
+        if (typeof translate === 'undefined') {
+          translate = $.getTranslate(col.wrapper[0], 'y');
+        }
+        if (typeof activeIndex === 'undefined') activeIndex = -Math.round((translate - maxTranslate) / itemHeight);
+        if (activeIndex < 0) activeIndex = 0;
+        if (activeIndex >= col.items.length) activeIndex = col.items.length - 1;
+        var previousActiveIndex = col.activeIndex;
+        col.activeIndex = activeIndex;
+        /*
+         col.wrapper.find('.picker-selected, .picker-after-selected, .picker-before-selected').removeClass('picker-selected picker-after-selected picker-before-selected');
+
+         col.items.transition(transition);
+         var selectedItem = col.items.eq(activeIndex).addClass('picker-selected').transform('');
+         var prevItems = selectedItem.prevAll().addClass('picker-before-selected');
+         var nextItems = selectedItem.nextAll().addClass('picker-after-selected');
+         */
+        //去掉 .picker-after-selected, .picker-before-selected 以提高性能
+        col.wrapper.find('.picker-selected').removeClass('picker-selected');
+        if (p.params.rotateEffect) {
+          col.items.transition(transition);
+        }
+        var selectedItem = col.items.eq(activeIndex).addClass('picker-selected').transform('');
+        if (clear) selectedItem.removeClass('picker-selected');
+
+        if (valueCallbacks || typeof valueCallbacks === 'undefined') {
+          // Update values
+          col.value = selectedItem.attr('data-picker-value');
+          col.displayValue = col.displayValues ? col.displayValues[activeIndex] : col.value;
+          // On change callback
+          if (previousActiveIndex !== activeIndex) {
+            if (col.onChange) {
+              col.onChange(p, col.value, col.displayValue);
             }
+            p.updateValue(clear);
+          }
         }
 
-        if (!p.inline) $('html').on('click', closeOnHTMLClick);
+        // Set 3D rotate effect
+        if (!p.params.rotateEffect) {
+          return;
+        }
+        var percentage = (translate - (Math.floor((translate - maxTranslate) / itemHeight) * itemHeight + maxTranslate)) / itemHeight;
 
-        // Open
-        function onPickerClose() {
-            p.opened = false;
-            if (p.input && p.input.length > 0) p.input.parents('.content').css({'padding-bottom': ''});
-            if (p.params.onClose) p.params.onClose(p);
+        col.items.each(function () {
+          var item = $(this);
+          var itemOffsetTop = item.index() * itemHeight;
+          var translateOffset = maxTranslate - translate;
+          var itemOffset = itemOffsetTop - translateOffset;
+          var percentage = itemOffset / itemHeight;
 
-            // Destroy events
-            p.container.find('.picker-items-col').each(function () {
-                p.destroyPickerCol(this);
+          var itemsFit = Math.ceil(col.height / itemHeight / 2) + 1;
+
+          var angle = (-18 * percentage);
+          if (angle > 180) angle = 180;
+          if (angle < -180) angle = -180;
+          // Far class
+          if (Math.abs(percentage) > itemsFit) item.addClass('picker-item-far');
+          else item.removeClass('picker-item-far');
+          // Set transform
+          item.transform('translate3d(0, ' + (-translate + maxTranslate) + 'px, ' + (originBug ? -110 : 0) + 'px) rotateX(' + angle + 'deg)');
+        });
+      };
+
+      function updateDuringScroll() {
+        animationFrameId = $.requestAnimationFrame(function () {
+          col.updateItems(undefined, undefined, 0);
+          updateDuringScroll();
+        });
+      }
+
+      // Update items on init
+      if (updateItems) col.updateItems(0, maxTranslate, 0);
+
+      var allowItemClick = true;
+      var isTouched, isMoved, touchStartY, touchCurrentY, touchStartTime, touchEndTime, startTranslate, returnTo, currentTranslate, prevTranslate, velocityTranslate, velocityTime;
+
+      function handleTouchStart(e) {
+        if (isMoved || isTouched) return;
+        e.preventDefault();
+        isTouched = true;
+        touchStartY = touchCurrentY = e.type === 'touchstart' ? e.targetTouches[0].pageY : e.pageY;
+        touchStartTime = (new Date()).getTime();
+
+        allowItemClick = true;
+        startTranslate = currentTranslate = $.getTranslate(col.wrapper[0], 'y');
+      }
+
+      function handleTouchMove(e) {
+        if (!isTouched) return;
+        e.preventDefault();
+        allowItemClick = false;
+        touchCurrentY = e.type === 'touchmove' ? e.targetTouches[0].pageY : e.pageY;
+        if (!isMoved) {
+          // First move
+          $.cancelAnimationFrame(animationFrameId);
+          isMoved = true;
+          startTranslate = currentTranslate = $.getTranslate(col.wrapper[0], 'y');
+          col.wrapper.transition(0);
+        }
+        e.preventDefault();
+
+        var diff = touchCurrentY - touchStartY;
+        currentTranslate = startTranslate + diff;
+        returnTo = undefined;
+
+        // Normalize translate
+        if (currentTranslate < minTranslate) {
+          currentTranslate = minTranslate - Math.pow(minTranslate - currentTranslate, 0.8);
+          returnTo = 'min';
+        }
+        if (currentTranslate > maxTranslate) {
+          currentTranslate = maxTranslate + Math.pow(currentTranslate - maxTranslate, 0.8);
+          returnTo = 'max';
+        }
+        // Transform wrapper
+        col.wrapper.transform('translate3d(0,' + currentTranslate + 'px,0)');
+
+        // Update items
+        col.updateItems(undefined, currentTranslate, 0, p.params.updateValuesOnTouchmove);
+
+        // Calc velocity
+        velocityTranslate = currentTranslate - prevTranslate || currentTranslate;
+        velocityTime = (new Date()).getTime();
+        prevTranslate = currentTranslate;
+      }
+
+      function handleTouchEnd(e) {
+        if (!isTouched || !isMoved) {
+          isTouched = isMoved = false;
+          return;
+        }
+        isTouched = isMoved = false;
+        col.wrapper.transition('');
+        if (returnTo) {
+          if (returnTo === 'min') {
+            col.wrapper.transform('translate3d(0,' + minTranslate + 'px,0)');
+          }
+          else col.wrapper.transform('translate3d(0,' + maxTranslate + 'px,0)');
+        }
+        touchEndTime = new Date().getTime();
+        var velocity, newTranslate;
+        if (touchEndTime - touchStartTime > 300) {
+          newTranslate = currentTranslate;
+        }
+        else {
+          velocity = Math.abs(velocityTranslate / (touchEndTime - velocityTime));
+          newTranslate = currentTranslate + velocityTranslate * p.params.momentumRatio;
+        }
+
+        newTranslate = Math.max(Math.min(newTranslate, maxTranslate), minTranslate);
+
+        // Active Index
+        var activeIndex = -Math.floor((newTranslate - maxTranslate) / itemHeight);
+
+        // Normalize translate
+        if (!p.params.freeMode) newTranslate = -activeIndex * itemHeight + maxTranslate;
+
+        // Transform wrapper
+        col.wrapper.transform('translate3d(0,' + (parseInt(newTranslate, 10)) + 'px,0)');
+
+        // Update items
+        col.updateItems(activeIndex, newTranslate, '', true);
+
+        // Watch items
+        if (p.params.updateValuesOnMomentum) {
+          updateDuringScroll();
+          col.wrapper.transitionEnd(function () {
+            $.cancelAnimationFrame(animationFrameId);
+          });
+        }
+
+        // Allow click
+        setTimeout(function () {
+          allowItemClick = true;
+        }, 100);
+      }
+
+      function handleClick(e) {
+        if (!allowItemClick) return;
+        $.cancelAnimationFrame(animationFrameId);
+        /*jshint validthis:true */
+        var value = $(this).attr('data-picker-value');
+        col.setValue(value);
+      }
+
+      col.initEvents = function (detach) {
+        var method = detach ? 'off' : 'on';
+        col.container[method]($.touchEvents.start, handleTouchStart);
+        col.container[method]($.touchEvents.move, handleTouchMove);
+        col.container[method]($.touchEvents.end, handleTouchEnd);
+        col.items[method]('click', handleClick);
+      };
+      col.destroyEvents = function () {
+        col.initEvents(true);
+      };
+
+      col.container[0].f7DestroyPickerCol = function () {
+        col.destroyEvents();
+      };
+
+      col.initEvents();
+
+    };
+    p.destroyPickerCol = function (colContainer) {
+      colContainer = $(colContainer);
+      if ('f7DestroyPickerCol' in colContainer[0]) colContainer[0].f7DestroyPickerCol();
+    };
+    // Resize cols
+    function resizeCols() {
+      if (!p.opened) return;
+      for (var i = 0; i < p.cols.length; i++) {
+        if (!p.cols[i].divider) {
+          p.cols[i].calcSize();
+          p.cols[i].setValue(p.cols[i].value, 0, false);
+        }
+      }
+    }
+
+    $(window).on('resize', resizeCols);
+
+    // HTML Layout
+    p.columnHTML = function (col, onlyItems, colCfg) {
+      var columnItemsHTML = '', colCfg = colCfg || {};
+      var columnHTML = '';
+      if (!col.textAlign) col.textAlign = 'center';
+      if (col.divider) {
+        columnHTML += '<div class="picker-items-col picker-items-col-divider ' + (col.textAlign ? 'picker-items-col-' + col.textAlign : '') + ' ' + (col.cssClass || colCfg.cssClass || p.params.colCssClass || '') + '">' + col.content + '</div>';
+      }
+      else {
+        for (var j = 0; j < col.values.length; j++) {
+          var dispVal = $.sui.enHtml(col.displayValues ? col.displayValues[j] : col.values[j]);
+          columnItemsHTML += '<div class="picker-item" data-picker-value="' + $.sui.enHtml(col.values[j]) + '">' + dispVal + '</div>';
+        }
+
+        columnHTML += '<div class="picker-items-col ' + (col.textAlign ? 'picker-items-col-' + col.textAlign : '') + ' ' + (col.cssClass || colCfg.cssClass || p.params.colCssClass || '') + '"><div class="picker-items-col-wrapper">' + columnItemsHTML + '</div></div>';
+      }
+      return onlyItems ? columnItemsHTML : columnHTML;
+    };
+    p.layout = function () {
+      var pickerHTML = '';
+      var pickerClass = '';
+      var i;
+      p.cols = [];
+      var colsHTML = '';
+      for (i = 0; i < p.params.cols.length; i++) {
+        var col = p.params.cols[i];
+        if (i > 0) {
+          if (!col) col = p.params.cols[i] = {values: '', textAlign: 'center', displayValues: '　'};
+          else {
+            if (!col.values) col.values = [];
+            if (col.values.length <= 0) {
+              col.values.push('');
+              if (!col.displayValues) col.displayValues = [];
+              col.displayValues.push(p.params.emptyDisp || '');
+            }
+          }
+        }
+        colsHTML += p.columnHTML(p.params.cols[i], null, p.params.colsCfg[i]);
+        p.cols.push(col);
+      }
+      pickerClass = 'picker-modal picker-columns ' + (p.params.cssClass || '') + (p.params.rotateEffect ? ' picker-3d' : '');
+      pickerHTML =
+        '<div class="' + (pickerClass) + '">' +
+        (p.params.toolbar ? p.params.toolbarTemplate.replace(/{{closeText}}/g, p.params.toolbarCloseText) : '') +
+        '<div class="picker-modal-inner picker-items">' +
+        colsHTML +
+        '<div class="picker-center-highlight"></div>' +
+        '</div>' +
+        '</div>';
+
+      p.pickerHTML = pickerHTML;
+    };
+
+    // Input Events
+    function openOnInput(e) {
+      e.preventDefault();
+      // 安卓微信webviewreadonly的input依然弹出软键盘问题修复
+      if ($.device.isWeixin && $.device.android && p.params.inputReadOnly) {
+        /*jshint validthis:true */
+        this.focus();
+        this.blur();
+      }
+      if (p.opened) return;
+      p.open();
+      if (p.params.scrollToInput) {
+        var pageContent = p.input.parents('.content');
+        if (pageContent.length === 0) return;
+
+        var paddingTop = parseInt(pageContent.css('padding-top'), 10),
+          paddingBottom = parseInt(pageContent.css('padding-bottom'), 10),
+          pageHeight = pageContent[0].offsetHeight - paddingTop - p.container.height(),
+          pageScrollHeight = pageContent[0].scrollHeight - paddingTop - p.container.height(),
+          newPaddingBottom;
+        var inputTop = p.input.offset().top - paddingTop + p.input[0].offsetHeight;
+        if (inputTop > pageHeight) {
+          var scrollTop = pageContent.scrollTop() + inputTop - pageHeight;
+          if (scrollTop + pageHeight > pageScrollHeight) {
+            newPaddingBottom = scrollTop + pageHeight - pageScrollHeight + paddingBottom;
+            if (pageHeight === pageScrollHeight) {
+              newPaddingBottom = p.container.height();
+            }
+            pageContent.css({'padding-bottom': (newPaddingBottom) + 'px'});
+          }
+          pageContent.scrollTop(scrollTop, 300);
+        }
+      }
+    }
+
+    function closeOnHTMLClick(e) {
+      if (!p.opened) return;
+      if (p.input && p.input.length > 0) {
+        if (e.target !== p.input[0] && $(e.target).parents('.picker-modal').length === 0) p.close();
+      }
+      else {
+        if ($(e.target).parents('.picker-modal').length === 0) p.close();
+      }
+    }
+
+    if (p.params.input) {
+      p.input = $(p.params.input);
+      if (p.input.length > 0) {
+        if (p.params.inputReadOnly) p.input.prop('readOnly', true);
+        if (!p.inline) {
+          p.input.on('click', openOnInput);
+        }
+      }
+    }
+
+    if (!p.inline) $('html').on('click', closeOnHTMLClick);
+
+    // Open
+    function onPickerClose() {
+      p.opened = false;
+      if (p.input && p.input.length > 0) p.input.parents('.content').css({'padding-bottom': ''});
+      if (p.params.onClose) p.params.onClose(p);
+
+      // Destroy events
+      p.container.find('.picker-items-col').each(function () {
+        p.destroyPickerCol(this);
+      });
+    }
+
+    p.opened = false;
+    p.open = function () {
+      if (!p.opened) {
+
+        // Layout
+        p.layout();
+
+        // Append
+        if (p.inline) {
+          p.container = $(p.pickerHTML);
+          p.container.addClass('picker-modal-inline');
+          $(p.params.container).append(p.container);
+          p.opened = true;
+        }
+        else {
+          p.container = $($.pickerModal(p.pickerHTML));
+          $(p.container)
+            .one('opened', function () {
+              p.opened = true;
+            })
+            .on('close', function () {
+              onPickerClose();
             });
         }
 
-        p.opened = false;
-        p.open = function () {
-            if (!p.opened) {
+        // Store picker instance
+        p.container[0].f7Picker = p;
 
-                // Layout
-                p.layout();
-
-                // Append
-                if (p.inline) {
-                    p.container = $(p.pickerHTML);
-                    p.container.addClass('picker-modal-inline');
-                    $(p.params.container).append(p.container);
-                    p.opened = true;
-                }
-                else {
-                    p.container = $($.pickerModal(p.pickerHTML));
-                    $(p.container)
-                        .one('opened', function() {
-                            p.opened = true;
-                        })
-                        .on('close', function () {
-                            onPickerClose();
-                        });
-                }
-
-                // Store picker instance
-                p.container[0].f7Picker = p;
-
-                // Init Events
-                p.container.find('.picker-items-col').each(function () {
-                    var updateItems = true;
-                    if ((!p.initialized && p.params.value) || (p.initialized && p.value)) updateItems = false;
-                    p.initPickerCol(this, updateItems);
-                });
-
-                // Set value
-                if (!p.initialized) {
-                    if (p.params.value) {
-                        p.setValue(p.params.value, 0);
-                    }
-                }
-                else {
-                    if (p.value) p.setValue(p.value, 0);
-                }
-            }
-
-            // Set flag
-            p.initialized = true;
-
-            if (p.params.onOpen) p.params.onOpen(p);
-        };
-
-        // Close
-        p.close = function () {
-            if (!p.opened || p.inline) return;
-            $.closeModal(p.container);
-            return;
-        };
-
-        // Destroy
-        p.destroy = function () {
-            p.close();
-            if (p.params.input && p.input.length > 0) {
-                p.input.off('click', openOnInput);
-            }
-            $('html').off('click', closeOnHTMLClick);
-            $(window).off('resize', resizeCols);
-        };
-
-        if (p.inline) {
-            p.open();
-        }
-
-        return p;
-    };
-
-    $(document).on("click", ".close-picker", function() {
-        var pickerToClose = $('.picker-modal.modal-in');
-        $.closeModal(pickerToClose);
-    });
-
-    $.fn.picker = function(params) {
-        var args = arguments;
-        return this.each(function() {
-            if(!this) return;
-            var $this = $(this);
-
-            var picker = $this.data("picker");
-            if(!picker) {
-                var p = $.extend({
-                    input: this,
-                    value: $this.val() ? $this.val().split(' ') : ''
-                }, params);
-                picker = new Picker(p);
-                $this.data("picker", picker);
-            }
-            if(typeof params === typeof "a") {
-                picker[params].apply(picker, Array.prototype.slice.call(args, 1));
-            }
+        // Init Events
+        p.container.find('.picker-items-col').each(function () {
+          var updateItems = true;
+          if ((!p.initialized && p.params.value) || (p.initialized && p.value)) updateItems = false;
+          p.initPickerCol(this, updateItems);
         });
+
+        p.container.find('.clear-picker').bind('click', function () {
+          for (var i = 0; i < p.cols.length; i++) {
+            if (!p.cols[i].divider) p.cols[i].setValue('', 0, true, true);
+          }
+          p.updateValue(true);
+        });
+
+        // Set value
+        if (!p.initialized) {
+          if (p.params.value) {
+            p.setValue(p.params.value, 0);
+          }
+        }
+        else {
+          if (p.value) p.setValue(p.value, 0);
+        }
+      }
+
+      if (p.params.onOpen) p.params.onOpen(p);
+      // Set flag
+      p.initialized = true;
     };
+
+    // Close
+    p.close = function () {
+      if (!p.opened || p.inline) return;
+      $.closeModal(p.container);
+      return;
+    };
+
+    // Destroy
+    p.destroy = function () {
+      p.close();
+      if (p.params.input && p.input.length > 0) {
+        p.input.off('click', openOnInput);
+      }
+      $('html').off('click', closeOnHTMLClick);
+      $(window).off('resize', resizeCols);
+    };
+
+    if (p.inline) {
+      p.open();
+    }
+
+    return p;
+  };
+
+  $(document).on("click", ".close-picker", function () {
+    var pickerToClose = $('.picker-modal.modal-in');
+    $.closeModal(pickerToClose);
+  });
+
+  $.fn.picker = function (params) {
+    var args = arguments;
+    return this.each(function () {
+      if (!this) return;
+      var $this = $(this);
+
+      var picker = $this.data("picker");
+      if (!picker) {
+        var p = $.extend({
+          input: this,
+          value: $this.val() ? $this.val().split(params.splitChar || ' ') : ''
+        }, params);
+        picker = new Picker(p);
+        $this.data("picker", picker);
+      }
+      if (typeof params === typeof "a") {
+        picker[params].apply(picker, Array.prototype.slice.call(args, 1));
+      }
+    });
+  };
+}(Zepto);
+
+/*======================================================
+ ************   QuerySelect   ************
+ ======================================================*/
+/* jshint unused:false */
+/* jshint multistr:true */
++function ($) {
+  "use strict";
+  var querySelect = function (params) {
+    var qs = this;
+    var defaults = {
+      splitChar: ' ',
+      keepInExist: true,
+      headTitle: '请选择',
+      okBtnTxt: '确定',
+      clearBtnTxt: '清除',
+      // Common settings
+      toolbarTemplate: '<header class="bar bar-nav">\
+                          <button class="button button-link pull-right close-query-select">确定</button>\
+                          <button class="button button-link pull-left clear-query-select">清除</button>\
+                          <h1 class="title"></h1>\
+                        </header>',
+      searchTemplate: '<div class="bar bar-header-secondary">\
+                          <div class="searchbar">\
+                            <a class="searchbar-cancel">x</a>\
+                            <div class="search-input">\
+                              <label class="icon icon-search" for="search"></label>\
+                              <input type="search" placeholder="请输入关键字..."/>\
+                            </div>\
+                          </div>\
+                        </div>',
+      itemTemplate: '<li class="query-select-item">\
+                       <label class="label-checkbox item-content">\
+                         <input class="query-select-checkbox" name="item">\
+                         <div class="item-media"><i class="icon icon-form-checkbox"></i></div>\
+                         <div class="item-inner">\
+                           <div class="item-subtitle"></div>\
+                         </div>\
+                       </label>\
+                     </li>'
+    };
+    params = params || {};
+    for (var def in defaults) if (typeof params[def] === 'undefined') params[def] = defaults[def];
+    qs.params = params;
+    qs.initialized = false;
+
+    function setInputVal() {
+      var names = qs.getDispValue();
+      qs.input.val(names.join(qs.params.splitChar || ' '));
+      if (qs.params.onChange) qs.params.onChange.apply(qs);
+    }
+
+    function updateTitle() {
+      if (qs.params.multiple) {
+        qs.selectedTitle.text('已选 ' + qs.selectedMap.size() + ' 项');
+      } else {
+        var keys = qs.selectedMap.keys(), title = '请选择';
+        if (keys.length == 1) title = qs.selectedMap.getAt(0).name || qs.selectedMap.getAt(0).n;
+        qs.selectedTitle.text(title)
+      }
+    }
+
+    qs.clear = function () {
+      if (qs.selectedMap.size() <= 0) return;
+
+      qs.selectedMap.clear();
+      setInputVal();
+      if (qs.opened) {
+        qs.container.find('input.query-select-checkbox').prop('checked', false);
+        updateTitle();
+      }
+    };
+
+    // Value
+    qs.setValue = function (arrValue) {
+      if (!arrValue) return;
+      $.each(arrValue, function (i, value) {
+        qs.selectedMap.put(value.code || value.c, value);
+        if (qs.loaded) {
+          var item = qs.itemMap[value.code || value.c];
+          if (item) item.prop('checked', true);
+        }
+      });
+      setInputVal();
+    };
+
+    qs.getDispValue = function () {
+      var names = [];
+      if (qs.selectedMap)
+        $.each(qs.selectedMap.keys(), function (i, code) {
+          names.push(qs.selectedMap.get(code).name || qs.selectedMap.get(code).n);
+        });
+      return names;
+    };
+
+    qs.getValue = function () {
+      return qs.selectedMap && qs.selectedMap.keys() || [];
+    };
+
+    // HTML Layout
+    qs.layout = function () {
+      qs.popupHtml =
+        '<div class="popup popup-about">' + qs.params.toolbarTemplate + qs.params.searchTemplate +
+        '  <div class="content">\
+             <div class="content-block-title selected-count"></div>\
+             <div class="card">\
+               <div class="card-content">\
+                 <div class="list-block media-list">\
+                   <ul></ul>\
+                 </div>\
+               </div>\
+             </div>\
+           </div>\
+         </div>';
+    };
+
+    // Input Events
+    function openOnInput(e) {
+      e.preventDefault();
+      // 安卓微信webviewreadonly的input依然弹出软键盘问题修复
+      if ($.device.isWeixin && $.device.android) {
+        /*jshint validthis:true */
+        this.focus();
+        this.blur();
+      }
+      if (qs.opened) return;
+      qs.open();
+    }
+
+    if (qs.params.input) {
+      qs.input = $(qs.params.input);
+      if (qs.input.length > 0) {
+        qs.input.prop('readOnly', true);
+        qs.input.on('click', openOnInput);
+      }
+    }
+
+    // Open
+    function onQuerySelectClose() {
+      qs.opened = false;
+      if (qs.params.onClose) qs.params.onClose(qs);
+
+      // Destroy events // TODO
+    }
+
+    qs.loadData = function () {
+      var searchVal = qs.searchInput.val();
+      qs.params.loadData.call(qs, searchVal, function (data) {
+        qs.data = data || [];
+
+        var ul = qs.container.find('.list-block.media-list ul').empty(), checkedVals = {};
+        qs.itemMap = {}, qs.loaded = true;
+        $.each(qs.data, function (i, itemData) {
+          var item = $(qs.params.itemTemplate), itemCode = itemData.code || itemData.c || '';
+          qs.itemMap[itemCode] = item;
+          var input = item.find('input').attr('type', qs.params.multiple ? 'checkbox' : 'radio').val(itemCode);
+          input.data('query-select-data', itemData);
+          if (qs.selectedMap.containsKey(itemCode)) {
+            if (itemData.name || itemData.n) {
+              var oldItemData = qs.selectedMap.get(itemCode);
+              if ('name' in oldItemData) oldItemData.name = itemData.name || itemData.n;
+              else oldItemData.n = itemData.name || itemData.n;
+            }
+            input.prop('checked', true);
+            checkedVals[itemCode] = true;
+          }
+          item.find('.item-subtitle').text(itemData.name || itemData.n || '');
+          ul.append(item);
+        });
+
+        var notInListSelectedItems = [];
+        $.each(qs.selectedMap.keys(), function (i, k) {
+          if (checkedVals[k]) return;
+
+          if (qs.params.keepInExist) {
+            var item = $(qs.params.itemTemplate), itemData = qs.selectedMap.get(k), val = itemData.code || itemData.c || '';
+            qs.itemMap[val] = item;
+            var input = item.find('input').attr('type', qs.params.multiple ? 'checkbox' : 'radio').val(val);
+            item.find('.item-subtitle').text(itemData.name || itemData.n || '');
+            input.data('query-select-data', itemData).prop('checked', true);
+            notInListSelectedItems.push(item);
+          } else {
+            qs.selectedMap.remove(k);
+          }
+        });
+        for (var i = notInListSelectedItems.length - 1; i >= 0; i--)
+          ul.prepend(notInListSelectedItems[i]);
+
+        updateTitle();
+        setInputVal();
+      });
+    };
+
+    qs.opened = false, qs.selectedMap = new $.sui.orderedMap(), qs.itemMap = {}, qs.loaded = false;
+    qs.open = function () {
+      if (!qs.opened) {
+
+        // Layout
+        qs.layout();
+
+        // Append
+        qs.container = $($.popup(qs.popupHtml, true)).addClass('query-select-popup')
+          .one('opened', function () {
+            qs.opened = true;
+          }).on('close', onQuerySelectClose);
+
+        var t;
+        qs.searchInput = qs.container.find('input[type=search]').on('keydown', function (e) {
+          if (t) clearTimeout(t);
+          t = setTimeout(function () {
+            qs.loadData();
+          }, qs.params.queryDelay || 300);
+        });
+        qs.selectedTitle = qs.container.find('.selected-count');
+        qs.container.find('header .title').text(qs.params.headTitle);
+
+        // Store picker instance
+        qs.container[0].querySelect = qs;
+
+        // Init Events
+        qs.container.find('.clear-query-select').text(qs.params.clearBtnTxt).on('click', qs.clear);
+        qs.container.find('.close-query-select').text(qs.params.okBtnTxt).on('click', function () {
+          setInputVal();
+          $.closeModal(qs.container);
+        });
+        qs.container.find('.searchbar-cancel').on('click', function () {
+          var searchVal = qs.searchInput.val();
+          if (searchVal) {
+            qs.searchInput.val('');
+            qs.loadData();
+          }
+        });
+        qs.container.find('.list-block.media-list ul').on('click', function (e) {
+          var target = $(e.target);
+          if (!target.hasClass('query-select-checkbox')) return;
+          var itemCode = target.val(), itemData = target.data('query-select-data');
+          if (!qs.params.multiple) qs.selectedMap.clear();
+          if (target.prop('checked')) {
+            if (!qs.selectedMap.containsKey(itemCode)) qs.selectedMap.put(itemCode, itemData);
+          } else if (qs.selectedMap.containsKey(itemCode)) qs.selectedMap.remove(itemCode);
+          updateTitle();
+          setInputVal();
+        });
+      }
+
+      qs.loadData();
+
+      // Set flag
+      qs.initialized = true;
+
+      if (qs.params.onOpen) qs.params.onOpen(qs);
+    };
+
+    if (qs.params.value) qs.setValue(qs.params.value);
+
+    // Close
+    qs.close = function () {
+      $.closeModal(qs.container);
+    };
+
+    // Destroy
+    qs.destroy = function () {
+      $.closeModal(qs.container);
+      qs.input.removeData("query-select");
+    };
+
+    return qs;
+  };
+
+  $.fn.querySelect = function (params) {
+    var args = arguments;
+    return this.each(function () {
+      if (!this) return;
+      var $this = $(this);
+
+      var qSel = $this.data("query-select");
+      if (!qSel) {
+        var _params = $.extend({
+          input: this,
+          value: $this.val() ? $this.val().split(params.splitChar || ' ') : ''
+        }, params);
+        qSel = new querySelect(_params);
+        $this.data("query-select", qSel);
+      }
+      if (typeof params === typeof "a")
+        qSel[params].apply(qSel, Array.prototype.slice.call(args, 1));
+    });
+  };
 }(Zepto);
 
 /* jshint unused:false*/
 
-+ function($) {
-    "use strict";
++function ($) {
+  "use strict";
 
-    var today = new Date();
+  var today = new Date();
 
-    var getDays = function(max) {
-        var days = [];
-        for(var i=1; i<= (max||31);i++) {
-            days.push(i < 10 ? "0"+i : i);
+  var getDays = function (max) {
+    var days = [];
+    for (var i = 1; i <= (max || 31); i++) {
+      days.push(i < 10 ? "0" + i : i);
+    }
+    return days;
+  };
+
+  var getDaysByMonthAndYear = function (month, year) {
+    var int_d = new Date(year, parseInt(month) + 1 - 1, 1);
+    var d = new Date(int_d - 1);
+    return getDays(d.getDate());
+  };
+
+  var formatNumber = function (n) {
+    return n < 10 ? "0" + n : n;
+  };
+
+  var filtYears = function (params) {
+    var arr = [], years = params.cols[0].values, minYear, maxYear;
+
+    if (params.minDate && params.defMinDate.getTime() != params.minDate.getTime()) minYear = params.minDate.getFullYear();
+    if (params.maxDate && params.defMaxDate.getTime() != params.maxDate.getTime()) maxYear = params.maxDate.getFullYear();
+
+    y:for (var i = 0; i < years.length; i++) {
+      var year = years[i];
+      if (minYear != undefined && year < minYear) continue;
+      if (maxYear != undefined && year > maxYear) continue;
+
+      if (params.isDateDisabled) {
+        m:for (var month = 0; month < 12; month++) {
+          for (var date = 1; date <= 31; date++) {
+            var d = new Date(year, month, date);
+            if (d.getFullYear() != year) continue y;
+            if (d.getMonth() != month) continue m;
+            if (!params.isDateDisabled(d)) {
+              arr.push(year);
+              continue y;
+            }
+          }
         }
-        return days;
-    };
+      } else arr.push(year);
+    }
+    return arr;
+  };
 
-    var getDaysByMonthAndYear = function(month, year) {
-        var int_d = new Date(year, parseInt(month)+1-1, 1);
-        var d = new Date(int_d - 1);
-        return getDays(d.getDate());
-    };
+  var initMinMaxDate = function (picker, field) {
+    var pm = picker.params;
+    if (!picker[field] || picker[field].getTime() != pm[field].getTime())
+      pm[field] = picker[field] = new Date(pm[field].getFullYear(), pm[field].getMonth(), pm[field].getDate());
+  };
 
-    var formatNumber = function (n) {
-        return n < 10 ? "0" + n : n;
-    };
+  var initMinDate = function (picker) {
+    initMinMaxDate(picker, 'minDate');
+  };
 
-    var initMonthes = ('01 02 03 04 05 06 07 08 09 10 11 12').split(' ');
+  var initMaxDate = function (picker) {
+    initMinMaxDate(picker, 'maxDate');
+  };
 
-    var initYears = (function () {
-        var arr = [];
-        for (var i = 1950; i <= 2030; i++) { arr.push(i); }
-        return arr;
-    })();
+  var isOverMin = function (date, minDateTime, hasMinDate) {
+    return hasMinDate && date.getTime() < minDateTime;
+  };
 
+  var isOverMax = function (date, maxDateTime, hasMaxDate) {
+    return hasMaxDate && date.getTime() > maxDateTime;
+  };
 
-    var defaults = {
+  var formatDate = function (date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  };
 
-        rotateEffect: false,  //为了性能
+  var defMonthes = ('01 02 03 04 05 06 07 08 09 10 11 12').split(' ');
+  var defYears = function () {
+    var arr = [];
+    for (var i = 1950; i <= 2030; i++) arr.push(i);
+    return arr;
+  }();
+  var ONE_DAY = 24 * 3600 * 1000;
 
-        value: [today.getFullYear(), formatNumber(today.getMonth()+1), formatNumber(today.getDate()), today.getHours(), formatNumber(today.getMinutes())],
+  var getCheckedDate = function (picker, values, oldValues) {
+    var days = getDaysByMonthAndYear(values[1], values[0]), resetOld = false, newValues;
+    var currDay = values[2];
+    if (currDay > days.length) currDay = days.length;
 
-        onChange: function (picker, values, displayValues) {
-            var days = getDaysByMonthAndYear(picker.cols[1].value, picker.cols[0].value);
-            var currentValue = picker.cols[2].value;
-            if(currentValue > days.length) currentValue = days.length;
-            picker.cols[2].setValue(currentValue);
-        },
+    // check min max disabled
+    var pm = picker.params, currDate = new Date(values[0], Number(values[1]) - 1, values[2]);
 
-        formatValue: function (p, values, displayValues) {
-            return displayValues[0] + '-' + values[1] + '-' + values[2] + ' ' + values[3] + ':' + values[4];
-        },
+    if (!resetOld && pm.minDate) {
+      initMinDate(picker);
+      resetOld = currDate.getTime() < picker.minDate.getTime();
+      if (resetOld && !newValues) newValues = [picker.minDate.getFullYear(), formatNumber(picker.minDate.getMonth() + 1), picker.minDate.getDate()];
+    }
 
-        cols: [
-            // Years
-        {
-            values: initYears
-        },
-        // Months
-        {
-            values: initMonthes
-        },
-        // Days
-        {
-            values: getDays()
-        },
+    if (!resetOld && pm.maxDate) {
+      initMaxDate(picker);
+      resetOld = currDate.getTime() > picker.maxDate.getTime();
+      if (resetOld && !newValues) newValues = [picker.maxDate.getFullYear(), formatNumber(picker.maxDate.getMonth() + 1), picker.maxDate.getDate()];
+    }
 
-        // Space divider
-        {
-            divider: true,
-            content: '  '
-        },
-        // Hours
-        {
-            values: (function () {
-                var arr = [];
-                for (var i = 0; i <= 23; i++) { arr.push(i); }
-                return arr;
-            })(),
-        },
-        // Divider
-        {
-            divider: true,
-            content: ':'
-        },
-        // Minutes
-        {
-            values: (function () {
-                var arr = [];
-                for (var i = 0; i <= 59; i++) { arr.push(i < 10 ? '0' + i : i); }
-                return arr;
-            })(),
+    if (resetOld && pm.isDateDisabled) {
+      currDate = new Date(newValues[0], Number(newValues[1]) - 1, newValues[2]);
+      if (pm.isDateDisabled(currDate)) resetOld = false;
+    }
+
+    if (!resetOld && pm.isDateDisabled && pm.isDateDisabled(currDate)) {
+      if (!oldValues) {
+        var val = $(picker.input).val(), vals = picker.params.value, valDate = new Date(today.getTime());
+        if (val) vals = val.split(picker.params.splitChar);
+        if (vals.length == 3 && vals[0] && vals[1] && vals[2]) valDate = new Date(vals[0], vals[1], vals[2]);
+        oldValues = [valDate.getFullYear(), formatNumber(valDate.getMonth()), valDate.getDate()];
+      }
+      currDay = oldValues[2];
+      resetOld = true;
+
+      var newDate = newValues ? new Date(newValues[0], Number(newValues[1]) - 1, newValues[2]) : new Date(currDate.getTime());
+      newValues = null;
+      var oldDate = new Date(oldValues[0], Number(oldValues[1]) - 1, oldValues[2]);
+      var newDateBefore = new Date(newDate.getTime()), newDateAfter = new Date(newDate.getTime()), goOnLeft = true, goOnRight = true;
+      var isAfterOld = newDateBefore.getTime() > oldDate.getTime();
+
+      var minDateTime, maxDateTime, hasMin = picker.minDate || isAfterOld, hasMax = picker.maxDate || !isAfterOld;
+      if (hasMin) {
+        if (!isAfterOld || picker.minDate && oldDate.getTime() < picker.minDate.getTime()) minDateTime = picker.minDate.getTime();
+        else minDateTime = oldDate.getTime();
+      }
+      if (hasMax) {
+        if (isAfterOld || picker.maxDate && oldDate.getTime() > picker.maxDate.getTime()) maxDateTime = picker.maxDate.getTime();
+        else maxDateTime = oldDate.getTime();
+      }
+
+      while (goOnLeft || goOnRight) {
+        if (goOnLeft) {
+          newDateBefore.setTime(newDateBefore.getTime() - ONE_DAY);
+          goOnLeft = !isOverMin(newDateBefore, minDateTime, hasMin);
+          if (!pm.isDateDisabled(newDateBefore)) {
+            newValues = [newDateBefore.getFullYear(), formatNumber(newDateBefore.getMonth() + 1), newDateBefore.getDate()];
+            break;
+          }
+          if (!goOnLeft) {
+            var _tmpMin = new Date(minDateTime);
+            if (!pm.isDateDisabled(_tmpMin)) {
+              newValues = [_tmpMin.getFullYear(), formatNumber(_tmpMin.getMonth() + 1), _tmpMin.getDate()];
+              break;
+            } else goOnLeft = false;
+          }
         }
-        ]
-    };
+        if (goOnRight) {
+          newDateAfter.setTime(newDateAfter.getTime() + ONE_DAY);
+          goOnRight = !isOverMax(newDateAfter, maxDateTime, hasMax);
+          if (!pm.isDateDisabled(newDateAfter)) {
+            newValues = [newDateAfter.getFullYear(), formatNumber(newDateAfter.getMonth() + 1), newDateAfter.getDate()];
+            break;
+          }
+          if (!goOnRight) {
+            var _tmpMax = new Date(maxDateTime);
+            if (!pm.isDateDisabled(_tmpMax)) {
+              newValues = [_tmpMax.getFullYear(), formatNumber(_tmpMax.getMonth() + 1), _tmpMax.getDate()];
+              break;
+            } else goOnRight = false;
+          }
+        }
+      }
+      if (!newValues && oldValues) newValues = oldValues;
+    }
+    return resetOld && newValues ? newValues : currDay;
+  };
 
-    $.fn.datetimePicker = function(params) {
-        return this.each(function() {
-            if(!this) return;
-            var p = $.extend(defaults, params);
-            $(this).picker(p);
-            if (params.value) $(this).val(p.formatValue(p, p.value, p.value));
-        });
-    };
+  var defaults = {
+    rotateEffect: false,  //为了性能
+    splitChar: '-',
+    value: [today.getFullYear(), formatNumber(today.getMonth() + 1), formatNumber(today.getDate())],
+
+    onClose: function (picker) {
+      picker.opened = false;
+    },
+
+    onOpen: function (picker) {
+      picker.opened = true;
+      var oldValues = picker.value, inputVal = $(picker.input).val(), inputVals = inputVal.split(picker.params.splitChar);
+      if ((!oldValues || oldValues.length != 3) && !inputVals || inputVals.length != 3)
+        inputVals = [today.getFullYear(), formatNumber(today.getMonth() + 1), formatNumber(today.getDate())];
+
+      if (inputVals.length == 3) {
+        for (var i = 0; i < picker.cols.length; i++)
+          if (!picker.cols[i].divider) picker.cols[i].setValue('', 0, null, true);
+        picker.updateValue(true);
+
+        var result = getCheckedDate(picker, inputVals, oldValues);
+        if (!$.isArray(result)) result = [inputVals[0], inputVals[1], result];
+        picker.setValue(result)
+      }
+    },
+
+    onChange: function (picker, values, displayValues, oldValues, oldDisplayValues) {
+      var inputVal = $(picker.input).val(), forceSetValue = false;
+      if (!picker.opened && inputVal && values && values.length == 3) {
+        var inputValStr = values[0] + picker.params.splitChar + values[1] + picker.params.splitChar + values[2];
+        if (inputVal != inputValStr) {
+          values = inputVal.split(picker.params.splitChar);
+          forceSetValue = true;
+        }
+      }
+
+      var result = getCheckedDate(picker, values, oldValues);
+      if ($.isArray(result)) {
+        picker.setValue(result)
+      } else {
+        if (forceSetValue) picker.setValue([values[0], values[1], result]);
+        else picker.cols[2].setValue(result);
+      }
+    },
+
+    formatValue: function (p, values, displayValues) {
+      if (!displayValues || displayValues.length != 3) return '';
+      return displayValues[0] + p.params.splitChar + values[1] + p.params.splitChar + values[2];
+    },
+
+    cols: [
+      {values: defYears},// Years
+      {values: defMonthes},// Months
+      {values: getDays()}// Days
+    ]
+  };
+
+  $.fn.datePicker = function (params) {
+    return this.each(function () {
+      if (!this) return;
+
+      var $this = $(this);
+      var defMinDate = new Date(defYears[0], 0, 1);
+      var defMaxDate = new Date(defYears[defYears.length - 1], 11, 31);
+      var p = $.extend({
+        minDate: defMinDate, maxDate: defMaxDate, defMinDate: defMinDate, defMaxDate: defMaxDate
+      }, defaults, params);
+
+      if (p.minDate || p.maxDate || p.isDateDisabled)
+        p.cols = [{values: filtYears(p)}, {values: defMonthes}, {values: getDays()}];
+      if ($this && $this.val()) delete p.value;
+
+      $this.picker(p);
+      if (params.value) $this.val(p.formatValue(p, p.value, p.value));
+    });
+  };
+
+}(Zepto);
+
+/* jshint unused:false*/
+
++function ($) {
+  "use strict";
+
+  var today = new Date();
+
+  var getDays = function (max) {
+    var days = [];
+    for (var i = 1; i <= (max || 31); i++) {
+      days.push(i < 10 ? "0" + i : i);
+    }
+    return days;
+  };
+
+  var getDaysByMonthAndYear = function (month, year) {
+    var int_d = new Date(year, parseInt(month) + 1 - 1, 1);
+    var d = new Date(int_d - 1);
+    return getDays(d.getDate());
+  };
+
+  var formatNumber = function (n) {
+    return n < 10 ? "0" + n : n;
+  };
+
+  var filtYears = function (params) {
+    var arr = [], years = params.cols[0].values, minYear, maxYear;
+
+    if (params.minDate && params.defMinDate.getTime() != params.minDate.getTime()) minYear = params.minDate.getFullYear();
+    if (params.maxDate && params.defMaxDate.getTime() != params.maxDate.getTime()) maxYear = params.maxDate.getFullYear();
+
+    y:for (var i = 0; i < years.length; i++) {
+      var year = years[i];
+      if (minYear != undefined && year < minYear) continue;
+      if (maxYear != undefined && year > maxYear) continue;
+
+      if (params.isDateDisabled) {
+        m:for (var month = 0; month < 12; month++) {
+          for (var date = 1; date <= 31; date++) {
+            var d = new Date(year, month, date);
+            if (d.getFullYear() != year) continue y;
+            if (d.getMonth() != month) continue m;
+            if (!params.isDateDisabled(d)) {
+              arr.push(year);
+              continue y;
+            }
+          }
+        }
+      } else arr.push(year);
+    }
+    return arr;
+  };
+
+  var initMinMaxDate = function (picker, field) {
+    var pm = picker.params;
+    if (!picker[field] || picker[field].getTime() != pm[field].getTime())
+      pm[field] = picker[field] = new Date(pm[field].getFullYear(), pm[field].getMonth(), pm[field].getDate());
+  };
+
+  var initMinDate = function (picker) {
+    initMinMaxDate(picker, 'minDate');
+  };
+
+  var initMaxDate = function (picker) {
+    initMinMaxDate(picker, 'maxDate');
+  };
+
+  var isOverMin = function (date, minDateTime, hasMinDate) {
+    return hasMinDate && date.getTime() < minDateTime;
+  };
+
+  var isOverMax = function (date, maxDateTime, hasMaxDate) {
+    return hasMaxDate && date.getTime() > maxDateTime;
+  };
+
+  var formatDate = function (date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  };
+
+  var defMonthes = ('01 02 03 04 05 06 07 08 09 10 11 12').split(' ');
+  var defYears = function () {
+    var arr = [];
+    for (var i = 1950; i <= 2030; i++) arr.push(i);
+    return arr;
+  }();
+  var ONE_DAY = 24 * 3600 * 1000;
+
+  var getCheckedDate = function (picker, values, oldValues) {
+    var days = getDaysByMonthAndYear(values[1], values[0]), resetOld = false, newValues;
+    var currDay = values[2];
+    if (currDay > days.length) currDay = days.length;
+
+    // check min max disabled
+    var pm = picker.params, currDate = new Date(values[0], Number(values[1]) - 1, values[2]);
+
+    if (!oldValues) {
+      var val = $(picker.input).val(), vals = picker.params.value, valDate = new Date(today.getTime());
+      if (val) {
+        var minute = val.substring(val.indexOf(':') + 1);
+        var hour = formatNumber(Number(val.substring(val.indexOf(' ') + 1, val.indexOf(':'))));
+        val = val.substring(0, val.indexOf(' '));
+        if (val) {
+          vals = val.split(picker.params.splitChar);
+          if (vals.length > 3) vals = [vals[0], vals[1], vals[2]];
+        }
+      }
+      if (vals.length == 3 && vals[0] && vals[1] && vals[2]) valDate = new Date(vals[0], vals[1], vals[2]);
+      oldValues = [valDate.getFullYear(), formatNumber(valDate.getMonth()), valDate.getDate()];
+    }
+
+    if (!resetOld && pm.minDate) {
+      initMinDate(picker);
+      resetOld = currDate.getTime() < picker.minDate.getTime();
+      if (resetOld && !newValues) newValues = [picker.minDate.getFullYear(),
+        formatNumber(picker.minDate.getMonth() + 1), formatNumber(picker.minDate.getDate())];
+    }
+
+    if (!resetOld && pm.maxDate) {
+      initMaxDate(picker);
+      resetOld = currDate.getTime() > picker.maxDate.getTime();
+      if (resetOld && !newValues) newValues = [picker.maxDate.getFullYear(),
+        formatNumber(picker.maxDate.getMonth() + 1), formatNumber(picker.maxDate.getDate())];
+    }
+
+    if (resetOld && pm.isDateDisabled) {
+      currDate = new Date(newValues[0], Number(newValues[1]) - 1, newValues[2]);
+      if (pm.isDateDisabled(currDate)) resetOld = false;
+    }
+
+    if (!resetOld && pm.isDateDisabled && pm.isDateDisabled(currDate)) {
+      currDay = oldValues[2];
+      resetOld = true;
+
+      var newDate = newValues ? new Date(newValues[0], Number(newValues[1]) - 1, newValues[2]) : new Date(currDate.getTime());
+      newValues = null;
+      var oldDate = new Date(oldValues[0], Number(oldValues[1]) - 1, oldValues[2]);
+      var newDateBefore = new Date(newDate.getTime()), newDateAfter = new Date(newDate.getTime()), goOnLeft = true, goOnRight = true;
+      var isAfterOld = newDateBefore.getTime() > oldDate.getTime();
+
+      var minDateTime, maxDateTime, hasMin = picker.minDate || isAfterOld, hasMax = picker.maxDate || !isAfterOld;
+      if (hasMin) {
+        if (!isAfterOld || picker.minDate && oldDate.getTime() < picker.minDate.getTime()) minDateTime = picker.minDate.getTime();
+        else minDateTime = oldDate.getTime();
+      }
+      if (hasMax) {
+        if (isAfterOld || picker.maxDate && oldDate.getTime() > picker.maxDate.getTime()) maxDateTime = picker.maxDate.getTime();
+        else maxDateTime = oldDate.getTime();
+      }
+
+      while (goOnLeft || goOnRight) {
+        if (goOnLeft) {
+          newDateBefore.setTime(newDateBefore.getTime() - ONE_DAY);
+          goOnLeft = !isOverMin(newDateBefore, minDateTime, hasMin);
+          if (!pm.isDateDisabled(newDateBefore)) {
+            newValues = [newDateBefore.getFullYear(), formatNumber(newDateBefore.getMonth() + 1), newDateBefore.getDate()];
+            break;
+          }
+          if (!goOnLeft) {
+            var _tmpMin = new Date(minDateTime);
+            if (!pm.isDateDisabled(_tmpMin)) {
+              newValues = [_tmpMin.getFullYear(), formatNumber(_tmpMin.getMonth() + 1), _tmpMin.getDate()];
+              break;
+            } else goOnLeft = false;
+          }
+        }
+        if (goOnRight) {
+          newDateAfter.setTime(newDateAfter.getTime() + ONE_DAY);
+          goOnRight = !isOverMax(newDateAfter, maxDateTime, hasMax);
+          if (!pm.isDateDisabled(newDateAfter)) {
+            newValues = [newDateAfter.getFullYear(), formatNumber(newDateAfter.getMonth() + 1), newDateAfter.getDate()];
+            break;
+          }
+          if (!goOnRight) {
+            var _tmpMax = new Date(maxDateTime);
+            if (!pm.isDateDisabled(_tmpMax)) {
+              newValues = [_tmpMax.getFullYear(), formatNumber(_tmpMax.getMonth() + 1), _tmpMax.getDate()];
+              break;
+            } else goOnRight = false;
+          }
+        }
+      }
+      if (!newValues && oldValues) newValues = oldValues;
+    }
+    return resetOld && newValues ? newValues : currDay;
+  };
+
+  var defaults = {
+
+    rotateEffect: false,  //为了性能
+    splitChar: '-',
+    value: [today.getFullYear(), formatNumber(today.getMonth() + 1), formatNumber(today.getDate()), formatNumber(today.getHours()), formatNumber(today.getMinutes())],
+
+    onClose: function (picker) {
+      picker.opened = false;
+    },
+
+    onOpen: function (picker) {
+      picker.opened = true;
+      var oldValues = picker.value, inputVal = $(picker.input).val(), inputVals = [];
+      if (inputVal) {
+        var minute = inputVal.substring(inputVal.indexOf(':') + 1);
+        var hour = formatNumber(Number(inputVal.substring(inputVal.indexOf(' ') + 1, inputVal.indexOf(':'))));
+        inputVals = inputVal.substring(0, inputVal.indexOf(' ')).split(picker.params.splitChar);
+        if (inputVals && inputVals.length > 0) inputVals.push(hour, minute);
+      }
+      if ((!oldValues || oldValues.length != 5) && !inputVals || inputVals.length != 5)
+        inputVals = [today.getFullYear(), formatNumber(today.getMonth() + 1), formatNumber(today.getDate()), formatNumber(today.getHours()), formatNumber(today.getMinutes())];
+      if (inputVals.length == 5) {
+        for (var i = 0; i < picker.cols.length; i++)
+          if (!picker.cols[i].divider) picker.cols[i].setValue('', 0, null, true);
+        picker.updateValue(true);
+
+        var result = getCheckedDate(picker, inputVals, oldValues);
+        if ($.isArray(result)) result.push(inputVals[3], inputVals[4]);
+        else result = [inputVals[0], inputVals[1], result, inputVals[3], inputVals[4]];
+        picker.setValue(result)
+      }
+    },
+
+    onChange: function (picker, values, displayValues, oldValues, oldDisplayValues) {
+      var inputVal = $(picker.input).val(), forceSetValue = false, hour, minute;
+      if (!picker.opened && inputVal && values && values.length == 5) {
+        var inputValStr = values[0] + picker.params.splitChar + values[1] + picker.params.splitChar +
+          values[2] + ' ' + values[3] + ':' + values[4];
+        if (inputVal != inputValStr) {
+          minute = inputVal.substring(inputVal.indexOf(':') + 1);
+          hour = formatNumber(Number(inputVal.substring(inputVal.indexOf(' ') + 1, inputVal.indexOf(':'))));
+          values = inputVal.substring(0, inputVal.indexOf(' ')).split(picker.params.splitChar);
+          values.push(hour, minute);
+          forceSetValue = true;
+        }
+      }
+
+      var result = getCheckedDate(picker, values, oldValues);
+      if (oldValues && oldValues.length == 5) hour = oldValues[3], minute = oldValues[4];
+      if (values && values.length == 5) hour = values[3], minute = values[4];
+      if ($.isArray(result)) {
+        picker.setValue(result.concat([hour, minute]));
+      } else {
+        if (forceSetValue) picker.setValue([values[0], values[1], result, values[3], values[4]]);
+        else picker.cols[2].setValue(result);
+      }
+    },
+
+    formatValue: function (p, values, displayValues) {
+      if (!displayValues || displayValues.length != 5) return '';
+      return displayValues[0] + p.params.splitChar + values[1] + p.params.splitChar + values[2] + ' ' + values[3] + ':' + values[4];
+    },
+
+    cols: [
+      {values: defYears},// Years
+      {values: defMonthes},// Months
+      {values: getDays()},// Days
+      {divider: true, content: '  '},// Space divider
+      {// Hours
+        values: (function () {
+          var arr = [];
+          for (var i = 0; i <= 23; i++) {
+            arr.push(i < 10 ? '0' + i : i + '');
+          }
+          return arr;
+        })()
+      },
+      {divider: true, content: ':'},// Divider
+      {// Minutes
+        values: (function () {
+          var arr = [];
+          for (var i = 0; i <= 59; i++) {
+            arr.push(i < 10 ? '0' + i : i);
+          }
+          return arr;
+        })()
+      }
+    ]
+  };
+
+  $.fn.datetimePicker = function (params) {
+    return this.each(function () {
+      if (!this) return;
+
+      var $this = $(this);
+      var defMinDate = new Date(defYears[0], 0, 1);
+      var defMaxDate = new Date(defYears[defYears.length - 1], 11, 31);
+      var p = $.extend({
+        minDate: defMinDate, maxDate: defMaxDate, defMinDate: defMinDate, defMaxDate: defMaxDate
+      }, defaults, params);
+
+      if (p.minDate || p.maxDate || p.isDateDisabled)
+        p.cols = [{values: filtYears(p)}, {values: defMonthes}, {values: getDays()},
+          defaults.cols[3], defaults.cols[4], defaults.cols[5], defaults.cols[6]];
+      if ($this && $this.val()) delete p.value;
+
+      $this.picker(p);
+      if (params.value) $this.val(p.formatValue(p, p.value, p.value));
+    });
+  };
 
 }(Zepto);
 

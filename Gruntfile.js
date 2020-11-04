@@ -57,6 +57,8 @@ module.exports = function (grunt) {
                     'js/modal.js',
                     'js/calendar.js',
                     'js/picker.js',
+                    'js/query-select.js',
+                    'js/date-picker.js',
                     'js/datetime-picker.js',
                     'js/iscroll.js',
                     'js/scroller.js',
@@ -95,6 +97,16 @@ module.exports = function (grunt) {
                     'js/city-picker.js'
                 ],
                 dest: '<%= meta.distPath %>js/<%= pkg.name %>-city-picker.js'
+            },
+            treeCityPicker: {
+                options: {
+                    banner: '<%= banner %>'
+                },
+                src: [
+                  'js/tree-city-data.js',
+                  'js/tree-city-picker.js'
+                ],
+                dest: '<%= meta.distPath %>js/<%= pkg.name %>-tree-city-picker.js'
             }
         },
 
@@ -230,6 +242,10 @@ module.exports = function (grunt) {
             cityPicker: {
                 src: '<%= concat.cityPicker.dest %>',
                 dest: '<%= meta.distPath %>js/<%= pkg.name %>-city-picker.min.js'
+            },
+            treeCityPicker: {
+                src: '<%= concat.treeCityPicker.dest %>',
+                dest: '<%= meta.distPath %>js/<%= pkg.name %>-tree-city-picker.min.js'
             },
             docs: {
                 src: [
