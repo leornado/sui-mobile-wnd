@@ -2759,7 +2759,8 @@ input[type="button"].button {
 /* === Modals === */
 .modal-overlay,
 .preloader-indicator-overlay,
-.popup-overlay {
+.popup-overlay,
+.picker-overlay {
   position: absolute;
   left: 0;
   top: 0;
@@ -2774,12 +2775,16 @@ input[type="button"].button {
 }
 .modal-overlay.modal-overlay-visible,
 .preloader-indicator-overlay.modal-overlay-visible,
-.popup-overlay.modal-overlay-visible {
+.popup-overlay.modal-overlay-visible,
+.picker-overlay.modal-overlay-visible {
   visibility: visible;
   opacity: 1;
 }
 .popup-overlay {
   z-index: 10200;
+}
+.picker-overlay {
+  z-index: 11300;
 }
 .modal {
   width: 13.5rem;

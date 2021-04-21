@@ -292,7 +292,7 @@
         }
         var isPopup = modal.hasClass('popup');
         var isLoginScreen = modal.hasClass('login-screen');
-        var isPickerModal = modal.hasClass('picker-modal');
+        var isPickerModal = modal.hasClass('picker-modal'), isPickerOverlay = $.smConfig.pickerOverlay && isPickerModal;
         var isToast = modal.hasClass('toast');
         if (isModal) {
             modal.show();
@@ -307,14 +307,17 @@
         }
 
         var overlay;
-        if (!isLoginScreen && !isPickerModal && !isToast) {
-            if ($('.modal-overlay').length === 0 && !isPopup) {
+        if (!isLoginScreen && (!isPickerModal || isPickerOverlay) && !isToast) {
+            if ($('.modal-overlay').length === 0 && !isPopup && !isPickerModal) {
                 $(defaults.modalContainer).append('<div class="modal-overlay"></div>');
             }
             if ($('.popup-overlay').length === 0 && isPopup) {
                 $(defaults.modalContainer).append('<div class="popup-overlay"></div>');
             }
-            overlay = isPopup ? $('.popup-overlay') : $('.modal-overlay');
+            if ($('.picker-overlay').length === 0 && isPickerModal) {
+                $(defaults.modalContainer).append('<div class="picker-overlay"></div>');
+            }
+            overlay = isPopup ? $('.popup-overlay') : isPickerOverlay ? $('.picker-overlay') : $('.modal-overlay');
         }
 
         //Make sure that styles are applied, trigger relayout;
@@ -329,7 +332,7 @@
         }
 
         // Classes for transition in
-        if (!isLoginScreen && !isPickerModal && !isToast) overlay.addClass('modal-overlay-visible');
+        if (!isLoginScreen && (!isPickerModal || isPickerOverlay) && !isToast) overlay.addClass('modal-overlay-visible');
         modal.removeClass('modal-out').addClass('modal-in').transitionEnd(function (e) {
             if (modal.hasClass('modal-out')) modal.trigger('closed');
             else modal.trigger('opened');
@@ -349,15 +352,15 @@
             isPopup = modal.hasClass('popup'),
             isToast = modal.hasClass('toast'),
             isLoginScreen = modal.hasClass('login-screen'),
-            isPickerModal = modal.hasClass('picker-modal'),
+            isPickerModal = modal.hasClass('picker-modal'), isPickerOverlay = $.smConfig.pickerOverlay && isPickerModal,
             removeOnClose = modal.hasClass('remove-on-close'),
-            overlay = isPopup ? $('.popup-overlay') : $('.modal-overlay');
+            overlay = isPopup ? $('.popup-overlay') : isPickerOverlay ? $('.picker-overlay') : $('.modal-overlay');
         if (isPopup){
             if (modal.length === $('.popup.modal-in').length) {
                 overlay.removeClass('modal-overlay-visible');
             }
         }
-        else if (!(isPickerModal || isToast)) {
+        else if (!(isPickerModal || isToast) || isPickerOverlay) {
             overlay.removeClass('modal-overlay-visible');
         }
 
