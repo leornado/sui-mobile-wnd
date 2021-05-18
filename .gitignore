@@ -10,3 +10,5 @@ _site/*
 docs/demos/test.html
 docs/assets/js/test.js
 local/*
+.idea
+.idea/*
