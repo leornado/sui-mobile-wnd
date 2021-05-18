@@ -7444,7 +7444,7 @@ Device/OS Detection
 
         function handleTouchStart(e) {
             if (!$.allowPanelOpen || (!swipePanel && !swipePanelOnlyClose) || isTouched) return;
-            if ($('.modal-in, .photo-browser-in').length > 0) return;
+            if ($('.modal-in, .photo-browser-in').length > 0 || $('.modal-in, .photo-browser-v2-in').length > 0) return;
             if (!(swipePanelCloseOpposite || swipePanelOnlyClose)) {
                 if ($('.panel.active').length > 0 && !panel.hasClass('active')) return;
             }

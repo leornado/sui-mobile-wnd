@@ -4436,10 +4436,18 @@ Framework7 Layouts Themes
 .photo-browser.theme-dark .navbar,
 .theme-dark .view[data-page="photo-browser-slides"] .navbar,
 .view[data-page="photo-browser-slides"].theme-dark .navbar,
+.theme-dark .photo-browser-v2 .navbar,
+.photo-browser-v2.theme-dark .navbar,
+.theme-dark .view[data-page="photo-browser-v2-slides"] .navbar,
+.view[data-page="photo-browser-v2-slides"].theme-dark .navbar,
 .theme-dark .photo-browser .toolbar,
 .photo-browser.theme-dark .toolbar,
 .theme-dark .view[data-page="photo-browser-slides"] .toolbar,
-.view[data-page="photo-browser-slides"].theme-dark .toolbar {
+.view[data-page="photo-browser-slides"].theme-dark .toolbar,
+.theme-dark .photo-browser-v2 .toolbar,
+.photo-browser-v2.theme-dark .toolbar,
+.theme-dark .view[data-page="photo-browser-v2-slides"] .toolbar,
+.view[data-page="photo-browser-v2-slides"].theme-dark .toolbar {
   background: rgba(19, 19, 19, 0.95);
 }
 .theme-dark .tabbar a:not(.active) {
@@ -4630,10 +4638,18 @@ html:not(.watch-active-state) .theme-dark label.label-radio:active,
 .photo-browser.theme-white .navbar,
 .theme-white .view[data-page="photo-browser-slides"] .navbar,
 .view[data-page="photo-browser-slides"].theme-white .navbar,
+.theme-white .photo-browser-v2 .navbar,
+.photo-browser-v2.theme-white .navbar,
+.theme-white .view[data-page="photo-browser-v2-slides"] .navbar,
+.view[data-page="photo-browser-v2-slides"].theme-white .navbar,
 .theme-white .photo-browser .toolbar,
 .photo-browser.theme-white .toolbar,
 .theme-white .view[data-page="photo-browser-slides"] .toolbar,
-.view[data-page="photo-browser-slides"].theme-white .toolbar {
+.view[data-page="photo-browser-slides"].theme-white .toolbar,
+.theme-white .photo-browser-v2 .toolbar,
+.photo-browser-v2.theme-white .toolbar,
+.theme-white .view[data-page="photo-browser-v2-slides"] .toolbar,
+.view[data-page="photo-browser-v2-slides"].theme-white .toolbar {
   background: rgba(255, 255, 255, 0.95);
 }
 .theme-white .tabbar a:not(.active) {

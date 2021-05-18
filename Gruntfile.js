@@ -84,7 +84,8 @@ module.exports = function (grunt) {
                 src: [
                     'js/swiper.js',
                     'js/swiper-init.js',
-                    'js/photo-browser.js'
+                    'js/photo-browser.js',
+                    'js/photo-browser-v2.js'
                 ],
                 dest: '<%= meta.distPath %>js/<%= pkg.name %>-extend.js'
             },

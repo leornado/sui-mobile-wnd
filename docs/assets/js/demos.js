@@ -207,6 +207,75 @@ $(function () {
     });
   });
 
+  //图片浏览器2
+  $(document).on("pageInit", "#page-photo-browser-v2", function (e, id, page) {
+    var commonCfgs = {
+      swipeToClose: false,
+      tapMoveZoom: true,
+      maxZoom: 100,
+      toggleMaxZoom: 8,
+      debug: true,
+      sliderDebug: true,
+    };
+    var myPhotoBrowserStandalone = $.photoBrowserV2($.extend({
+      photos: [
+        '/img/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
+        '/img/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
+        '/img/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
+      ]
+    }, commonCfgs));
+    //点击时打开图片浏览器
+    $(page).on('click', '.pb-standalone', function () {
+      myPhotoBrowserStandalone.open();
+    });
+    /*=== Popup ===*/
+    var myPhotoBrowserPopup = $.photoBrowserV2($.extend({
+      photos: [
+        {
+          url: '/img/img-tall.png',
+          caption: 'Caption tall Text'
+        },
+        '/img/img-long.png',
+        '/img/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
+        '/img/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
+        '/img/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
+      ],
+      type: 'popup'
+    }, commonCfgs));
+    $(page).on('click', '.pb-popup', function () {
+      myPhotoBrowserPopup.open();
+    });
+    /*=== 有标题 ===*/
+    var myPhotoBrowserCaptions = $.photoBrowserV2($.extend({
+      photos: [
+        {
+          url: '/img/img-tall.png',
+          caption: 'Caption tall Text'
+        },
+        {
+          url: '/img/img-long.png',
+          caption: 'Caption long Text Caption long Text Caption long Text Caption long Text Caption long Text'
+        },
+        {
+          url: '/img/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
+          caption: 'Caption 1 Text'
+        },
+        {
+          url: '/img/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
+          caption: 'Second Caption Text'
+        },
+        // 这个没有标题
+        {
+          url: '/img/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
+        },
+      ],
+      theme: 'dark',
+      type: 'standalone'
+    }, commonCfgs));
+    $(page).on('click', '.pb-standalone-captions', function () {
+      myPhotoBrowserCaptions.open();
+    });
+  });
 
   //对话框
   $(document).on("pageInit", "#page-modal", function (e, id, page) {

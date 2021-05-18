@@ -938,14 +938,18 @@ Swiper
         };
 
         s.onTouchMove = function (e) {
+            if (s.params.debug) console.log('sw-move');
             if (e.originalEvent) e = e.originalEvent;
             if (isTouchEvent && e.type === 'mousemove') return;
+            if (s.params.debug) console.log('sw-move-10');
             if (e.preventedByNestedSwiper) return;
+            if (s.params.debug) console.log('sw-move-20');
             if (s.params.onlyExternal) {
                 isMoved = true;
                 s.allowClick = false;
                 return;
             }
+            if (s.params.debug) console.log('sw-move-30');
             if (isTouchEvent && document.activeElement) {
                 if (e.target === document.activeElement && $(e.target).is(formElements)) {
                     isMoved = true;
@@ -956,6 +960,7 @@ Swiper
 
             s.emit('onTouchMove', s, e);
 
+            if (s.params.debug) console.log('sw-move-40');
             if (e.targetTouches && e.targetTouches.length > 1) return;
 
             s.touches.currentX = e.type === 'touchmove' ? e.targetTouches[0].pageX : e.pageX;
@@ -973,11 +978,14 @@ Swiper
                     startMoving = true;
                 }
             }
+            if (s.params.debug) console.log('sw-move-50');
             if (!isTouched) return;
-            if (isScrolling)  {
+            if (s.params.debug) console.log('sw-move-60');
+            if (isScrolling && s.params.omitScrolling)  {
                 isTouched = false;
                 return;
             }
+            if (s.params.debug) console.log('sw-move-7onTransitionStart0');
             if (!startMoving && s.browser.ieTouch) {
                 return;
             }
@@ -1046,12 +1054,17 @@ Swiper
                 currentTranslate = startTranslate;
             }
 
+            if (s.params.debug) console.log('sw-move-80');
             if (!s.params.followFinger) return;
 
             // Threshold
+            if (s.params.debug) console.log('sw-move-90');
             if (s.params.threshold > 0) {
+                if (s.params.debug) console.log('sw-move-91');
                 if (Math.abs(diff) > s.params.threshold || allowThresholdMove) {
+                    if (s.params.debug) console.log('sw-move-92');
                     if (!allowThresholdMove) {
+                        if (s.params.debug) console.log('sw-move-93');
                         allowThresholdMove = true;
                         s.touches.startX = s.touches.currentX;
                         s.touches.startY = s.touches.currentY;
@@ -1061,10 +1074,12 @@ Swiper
                     }
                 }
                 else {
+                    if (s.params.debug) console.log('sw-move-94');
                     currentTranslate = startTranslate;
                     return;
                 }
             }
+            if (s.params.debug) console.log('sw-move-100');
             // Update active index in free mode
             if (s.params.freeMode || s.params.watchSlidesProgress) {
                 s.updateActiveIndex();
@@ -2488,6 +2503,8 @@ Swiper
     ====================================================*/
     Swiper.prototype = {
         defaults: {
+            debug: false,
+            omitScrolling: true,
             direction: 'horizontal',
             touchEventsTarget: 'container',
             initialSlide: 0,
