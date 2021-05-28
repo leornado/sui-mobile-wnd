@@ -1,3 +1,6 @@
+
+> 公司内部私用，克隆自阿里巴巴[SUI Mobile](http://m.sui.taobao.org/)
+
 # SUI Mobile(MSUI)
 
 ## 轻量的UI库

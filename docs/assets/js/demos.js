@@ -365,38 +365,105 @@ $(function () {
   });
 
   $(document).on("pageInit", "#page-query-select", function (e, id, page) {
-    var data = [];
-    for (var i = 0; i < 50; i++) data.push({c: 'code-' + i, n: '选项-' + i});
-    $("#query-select-s").querySelect({
-      headTitle: '单选',
-      value: [{code: 'code-12', name: 'code-12'}],
-      loadData: function (searchVal, callback) {
+    var initData = function (searchVal, lastDataInfo) {
+      var result = {data: []}, total = 72;
+      var dataInfo = lastDataInfo || {page: 0, pageSize: 15, total: total};
+
+      dataInfo.lastPage = Math.floor(dataInfo.total / dataInfo.pageSize);
+      if (dataInfo.total % dataInfo.pageSize !== 0) dataInfo.lastPage++;
+
+      var nextPage = dataInfo.page + 1;
+      dataInfo.hasMore = nextPage <= dataInfo.lastPage;
+      dataInfo.isIncrementData = false;
+
+      if (searchVal) {
+        var searchedInfo = dataInfo.searchedInfo;
+        if (searchVal !== dataInfo.searchVal) {
+          searchedInfo = dataInfo.searchedInfo = {data: []};
+          for (var i = 0; i < total; i++) {
+            var item = {c: 'code-' + i, n: '选项-' + i};
+            if (item.n.indexOf(searchVal) >= 0) searchedInfo.data.push(item);
+          }
+          dataInfo.total = searchedInfo.total = searchedInfo.data.length;
+          dataInfo.searchVal = searchVal;
+          dataInfo.page = 0;
+          nextPage = dataInfo.page + 1;
+        }
+
+        dataInfo.lastPage = Math.floor(dataInfo.total / dataInfo.pageSize);
+        if (dataInfo.total % dataInfo.pageSize !== 0) dataInfo.lastPage++;
+
+        dataInfo.hasMore = nextPage <= dataInfo.lastPage;
+        if (dataInfo.hasMore) {
+          for (var i = (nextPage - 1) * dataInfo.pageSize; i < Math.min(nextPage * dataInfo.pageSize, searchedInfo.total); i++)
+            result.data.push(searchedInfo.data[i]);
+          dataInfo.page = nextPage;
+        }
+      } else {
+        if (dataInfo.searchedInfo) {
+          delete dataInfo.searchVal;
+          delete dataInfo.searchedInfo;
+
+          dataInfo.total = total;
+          dataInfo.page = 0;
+          nextPage = dataInfo.page + 1;
+
+          dataInfo.lastPage = Math.floor(dataInfo.total / dataInfo.pageSize);
+          if (dataInfo.total % dataInfo.pageSize !== 0) dataInfo.lastPage++;
+
+          nextPage = dataInfo.page + 1;
+          dataInfo.hasMore = nextPage <= dataInfo.lastPage;
+        }
+
+        if (dataInfo.hasMore) {
+          for (var i = (nextPage - 1) * dataInfo.pageSize; i < Math.min(nextPage * dataInfo.pageSize, dataInfo.total); i++)
+            result.data.push({c: 'code-' + i, n: '选项-' + i});
+          dataInfo.page = nextPage;
+        }
+      }
+
+      if (dataInfo.page > 1) dataInfo.isIncrementData = true;
+      dataInfo.hasMore = dataInfo.page < dataInfo.lastPage;
+      result.dataInfo = dataInfo;
+      return result;
+    };
+
+    var querySelectDataLoader = function () {
+      return function (searchVal, callback) {
+        var qs = this, lastDataInfo = qs.lastDataInfo;
         setTimeout(function () {
-          if (searchVal) {
-            var filted = [];
-            $.each(data, function (i, n) {
-              if (n.name.indexOf(searchVal) >= 0) filted.push(n);
-            });
-            callback(filted);
-          } else callback(data);
+          var result = initData(searchVal, lastDataInfo);
+          callback(result.data, result.dataInfo);
         }, 500);
       }
+    };
+
+    $("#query-select-s").querySelect({
+      headTitle: '单选',
+      value    : [{code: 'code-12', name: 'code-12'}],
+      loadData : querySelectDataLoader()
     });
     $("#query-select-m").querySelect({
       headTitle: '多选',
-      multiple: true,
-      value: [{code: 'code-2', name: 'code-2'}, {c: 'code-12', n: '选项-12'}],
-      loadData: function (searchVal, callback) {
-        setTimeout(function () {
-          if (searchVal) {
-            var filted = [];
-            $.each(data, function (i, n) {
-              if (n.name.indexOf(searchVal) >= 0) filted.push(n);
-            });
-            callback(filted);
-          } else callback(data);
-        }, 1000);
-      }
+      multiple : true,
+      value    : [{code: 'code-2', name: 'code-2'}, {c: 'code-12', n: '选项-12'}],
+      loadData : querySelectDataLoader()
+    });
+    $("#query-select-deselectable").querySelect({
+      headTitle   : '单选 - deselectable',
+      deselectable: true,
+      value       : [{code: 'code-12', name: 'code-12'}],
+      loadData    : querySelectDataLoader()
+    });
+    $("#query-select-max").querySelect({
+      headTitle: '多选 - max',
+      multiple : true,
+      max      : function () {
+        console.log('---;');
+        return 2;
+      },
+      value    : [{code: 'code-2', name: 'code-2'}, {c: 'code-31', n: '选项-31'}],
+      loadData : querySelectDataLoader()
     });
   });
 
