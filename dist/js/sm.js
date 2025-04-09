@@ -4,7 +4,7 @@
  *
  * =====================================================
  */
-;$.smVersion = "0.6.2.1";+function ($) {
+;$.smVersion = "0.6.3";+function ($) {
     "use strict";
 
     //全局配置
@@ -3436,10 +3436,11 @@ Device/OS Detection
     qs.initialized = false;
     qs.loadDataExeMap = new $.sui.orderedMap();
 
-    function setInputVal() {
+    function setInputVal(opts) {
+      opts = opts || {};
       var names = qs.getDispValue();
       qs.input.val(names.join(qs.params.splitChar || ' '));
-      if (qs.params.onChange) qs.params.onChange.apply(qs);
+      if (opts.triggerOnChange !== false && qs.params.onChange) qs.params.onChange.apply(qs);
     }
 
     qs.isSelectable = function () {
@@ -3478,10 +3479,10 @@ Device/OS Detection
       }
     };
 
-    qs.clear = function () {
+    qs.clear = function (opts) {
       if (qs.selectedMap.size() > 0) {
         qs.selectedMap.clear();
-        setInputVal();
+        setInputVal(opts);
         if (qs.opened) {
           qs.container.find('input.query-select-checkbox').prop('checked', false);
           qs.updateTitle();
@@ -3490,16 +3491,19 @@ Device/OS Detection
     };
 
     // Value
-    qs.setValue = function (arrValue) {
+    qs.setValue = function (arrValue, opts) {
       if (!arrValue) return;
+
+      if (arrValue.length > 0) qs.clear(false);
+
       $.each(arrValue, function (i, value) {
         qs.selectedMap.put(value.code || value.c, value);
         if (qs.loaded) {
           var item = qs.itemMap[value.code || value.c];
-          if (item) item.prop('checked', true);
+          if (item) item.find('input').prop('checked', true);
         }
       });
-      setInputVal();
+      setInputVal(opts);
     };
 
     qs.getDispValue = function () {
@@ -3726,7 +3730,7 @@ Device/OS Detection
 
         // Init Events
         qs.container.find('.clear-query-select').text(qs.params.clearBtnTxt).on('click', function () {
-          qs.clear(true);
+          qs.clear();
           qsEl.trigger('clear-btn-click', [qs]);
         });
         qs.container.find('.close-query-select').text(qs.params.okBtnTxt).on('click', function () {

@@ -178,7 +178,7 @@ $(function () {
         '//img.alicdn.com/tps/i1/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
         '//img.alicdn.com/tps/i4/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
       ],
-      type: 'popup'
+      type  : 'popup'
     });
     $(page).on('click', '.pb-popup', function () {
       myPhotoBrowserPopup.open();
@@ -187,11 +187,11 @@ $(function () {
     var myPhotoBrowserCaptions = $.photoBrowser({
       photos: [
         {
-          url: '//img.alicdn.com/tps/i3/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
+          url    : '//img.alicdn.com/tps/i3/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
           caption: 'Caption 1 Text'
         },
         {
-          url: '//img.alicdn.com/tps/i1/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
+          url    : '//img.alicdn.com/tps/i1/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
           caption: 'Second Caption Text'
         },
         // 这个没有标题
@@ -199,8 +199,8 @@ $(function () {
           url: '//img.alicdn.com/tps/i4/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
         },
       ],
-      theme: 'dark',
-      type: 'standalone'
+      theme : 'dark',
+      type  : 'standalone'
     });
     $(page).on('click', '.pb-standalone-captions', function () {
       myPhotoBrowserCaptions.open();
@@ -210,12 +210,12 @@ $(function () {
   //图片浏览器2
   $(document).on("pageInit", "#page-photo-browser-v2", function (e, id, page) {
     var commonCfgs = {
-      swipeToClose: false,
-      tapMoveZoom: true,
-      maxZoom: 100,
+      swipeToClose : false,
+      tapMoveZoom  : true,
+      maxZoom      : 100,
       toggleMaxZoom: 8,
-      debug: true,
-      sliderDebug: true,
+      debug        : true,
+      sliderDebug  : true,
     };
     var myPhotoBrowserStandalone = $.photoBrowserV2($.extend({
       photos: [
@@ -232,7 +232,7 @@ $(function () {
     var myPhotoBrowserPopup = $.photoBrowserV2($.extend({
       photos: [
         {
-          url: '/img/img-tall.png',
+          url    : '/img/img-tall.png',
           caption: 'Caption tall Text'
         },
         '/img/img-long.png',
@@ -240,7 +240,7 @@ $(function () {
         '/img/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
         '/img/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
       ],
-      type: 'popup'
+      type  : 'popup'
     }, commonCfgs));
     $(page).on('click', '.pb-popup', function () {
       myPhotoBrowserPopup.open();
@@ -249,19 +249,19 @@ $(function () {
     var myPhotoBrowserCaptions = $.photoBrowserV2($.extend({
       photos: [
         {
-          url: '/img/img-tall.png',
+          url    : '/img/img-tall.png',
           caption: 'Caption tall Text'
         },
         {
-          url: '/img/img-long.png',
+          url    : '/img/img-long.png',
           caption: 'Caption long Text Caption long Text Caption long Text Caption long Text Caption long Text'
         },
         {
-          url: '/img/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
+          url    : '/img/TB1kt4wHVXXXXb_XVXX0HY8HXXX-1024-1024.jpeg',
           caption: 'Caption 1 Text'
         },
         {
-          url: '/img/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
+          url    : '/img/TB1SKhUHVXXXXb7XXXX0HY8HXXX-1024-1024.jpeg',
           caption: 'Second Caption Text'
         },
         // 这个没有标题
@@ -269,8 +269,8 @@ $(function () {
           url: '/img/TB1AdxNHVXXXXasXpXX0HY8HXXX-1024-1024.jpeg',
         },
       ],
-      theme: 'dark',
-      type: 'standalone'
+      theme : 'dark',
+      type  : 'standalone'
     }, commonCfgs));
     $(page).on('click', '.pb-standalone-captions', function () {
       myPhotoBrowserCaptions.open();
@@ -310,19 +310,19 @@ $(function () {
     $(page).on('click', '.create-actions', function () {
       var buttons1 = [
         {
-          text: '请选择',
+          text : '请选择',
           label: true
         },
         {
-          text: '卖出',
-          bold: true,
-          color: 'danger',
+          text   : '卖出',
+          bold   : true,
+          color  : 'danger',
           onClick: function () {
             $.alert("你选择了“卖出“");
           }
         },
         {
-          text: '买入',
+          text   : '买入',
           onClick: function () {
             $.alert("你选择了“买入“");
           }
@@ -331,7 +331,7 @@ $(function () {
       var buttons2 = [
         {
           text: '取消',
-          bg: 'danger'
+          bg  : 'danger'
         }
       ];
       var groups = [buttons1, buttons2];
@@ -354,7 +354,6 @@ $(function () {
       }, 2000);
     });
   });
-
 
   //选择颜色主题
   $(document).on("click", ".select-color", function (e) {
@@ -443,11 +442,42 @@ $(function () {
       value    : [{code: 'code-12', name: 'code-12'}],
       loadData : querySelectDataLoader()
     });
+    var oldValue = [];
     $("#query-select-m").querySelect({
       headTitle: '多选',
       multiple : true,
       value    : [{code: 'code-2', name: 'code-2'}, {c: 'code-12', n: '选项-12'}],
-      loadData : querySelectDataLoader()
+      loadData : querySelectDataLoader(),
+      onOpen   : function () {
+        var qs = this;
+        oldValue = qs.getValue();
+        console.log(oldValue);
+      },
+      onChange : function () {
+        var qs = window.aaa = this;
+
+        var newValue = qs.getValue();
+        var newCode1Idx = newValue.indexOf('code-1');
+        var newHasCode1 = newCode1Idx >= 0;
+        var oldCode1Idx = oldValue.indexOf('code-1');
+        var oldHasCode1 = oldCode1Idx >= 0;
+
+        if (newHasCode1) {
+          var items = [];
+          if (oldHasCode1) {
+            for (var k of qs.selectedMap.keys()) {
+              if (k === 'code-1') continue;
+              items.push(qs.selectedMap.get(k));
+            }
+          } else {
+            items.push({code: 'code-1', name: '选项-1'});
+          }
+          qs.setValue(items, {triggerOnChange: false});
+          console.log(items);
+        }
+
+        oldValue = newValue;
+      }
     });
     $("#query-select-deselectable").querySelect({
       headTitle   : '单选 - deselectable',
@@ -470,14 +500,13 @@ $(function () {
   // calendar
   $(document).on("pageInit", "#page-calendar", function (e) {
     $("#birthday").calendar({
-      minDate: new Date('2018-07-01'),
-      maxDate: new Date('2018-08-28'),
+      minDate       : new Date('2018-07-01'),
+      maxDate       : new Date('2018-08-28'),
       isDateDisabled: function (date) {
         return date && new Date(date).getDay() == 3;
       }
     });
   });
-
 
   //picker
   $(document).on("pageInit", "#page-picker", function (e, id, page) {
@@ -491,11 +520,11 @@ $(function () {
       </button>\
       <h1 class="title">标题</h1>\
       </header>',
-      cols: [
+      cols           : [
         {
           textAlign: 'center',
-          values: ['iPhone 4', 'iPhone 4S', 'iPhone 5', 'iPhone 5S', 'iPhone 6', 'iPhone 6 Plus', 'iPad 2', 'iPad Retina', 'iPad Air', 'iPad mini', 'iPad mini 2', 'iPad mini 3'],
-          cssClass: 'picker-items-col-normal'
+          values   : ['iPhone 4', 'iPhone 4S', 'iPhone 5', 'iPhone 5S', 'iPhone 6', 'iPhone 6 Plus', 'iPad 2', 'iPad Retina', 'iPad Air', 'iPad mini', 'iPad mini 2', 'iPad mini 3'],
+          cssClass : 'picker-items-col-normal'
         }
       ]
     });
@@ -504,18 +533,18 @@ $(function () {
       <button class="button button-link pull-right close-picker">确定</button>\
       <h1 class="title">请选择称呼</h1>\
       </header>',
-      cols: [
+      cols           : [
         {
           textAlign: 'center',
-          values: ['赵', '钱', '孙', '李', '周', '吴', '郑', '王']
+          values   : ['赵', '钱', '孙', '李', '周', '吴', '郑', '王']
         },
         {
           textAlign: 'center',
-          values: ['杰伦', '磊', '明', '小鹏', '燕姿', '菲菲', 'Baby']
+          values   : ['杰伦', '磊', '明', '小鹏', '燕姿', '菲菲', 'Baby']
         },
         {
           textAlign: 'center',
-          values: ['先生', '小姐']
+          values   : ['先生', '小姐']
         }
       ]
     });
@@ -525,9 +554,9 @@ $(function () {
       <button class="button button-link pull-right close-picker">确定</button>\
       <h1 class="title">请选择称呼</h1>\
       </header>',
-      rotateEffect: true,
-      splitChar: ',',
-      treeCols: [{
+      rotateEffect   : true,
+      splitChar      : ',',
+      treeCols       : [{
         c: 'zhao', n: '赵',
         d: [
           {c: 'jia', n: '甲'},
@@ -569,9 +598,9 @@ $(function () {
         <button class="button button-link pull-right close-picker">确定</button>\
         <h1 class="title">选择日期和时间</h1>\
       </header>',
-      minDate: new Date('2016-01-03'),
-      maxDate: new Date('2016-07-28'),
-      isDateDisabled: function (date) {
+      minDate        : new Date('2016-01-03'),
+      maxDate        : new Date('2016-07-28'),
+      isDateDisabled : function (date) {
         return date && (date.getFullYear() == 2017
           || date.getFullYear() == 2016 && (date.getMonth() + 1) != 1 && (date.getMonth() + 1) != 12);
       }
@@ -583,9 +612,9 @@ $(function () {
         <button class="button button-link pull-right close-picker">确定</button>\
         <h1 class="title">选择日期</h1>\
       </header>',
-      minDate: new Date('2016-01-03'),
-      maxDate: new Date('2016-07-28'),
-      isDateDisabled: function (date) {
+      minDate        : new Date('2016-01-03'),
+      maxDate        : new Date('2016-07-28'),
+      isDateDisabled : function (date) {
         return date && (date.getFullYear() == 2017
           || date.getFullYear() == 2016 && (date.getMonth() + 1) != 1 && (date.getMonth() + 1) != 12);
       }

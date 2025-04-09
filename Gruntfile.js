@@ -290,6 +290,7 @@ module.exports = function (grunt) {
 
         jshint: {
             options: {
+                force   : true,
                 jshintrc: 'js/.jshintrc'
             },
             grunt: {
