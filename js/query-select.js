@@ -102,7 +102,7 @@
     qs.setValue = function (arrValue, opts) {
       if (!arrValue) return;
 
-      if (arrValue.length > 0) qs.clear(false);
+      if (arrValue.length > 0) qs.clear(opts);
 
       $.each(arrValue, function (i, value) {
         qs.selectedMap.put(value.code || value.c, value);
@@ -111,6 +111,7 @@
           if (item) item.find('input').prop('checked', true);
         }
       });
+      qs.updateTitle();
       setInputVal(opts);
     };
 
