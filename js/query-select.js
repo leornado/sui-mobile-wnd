@@ -100,10 +100,9 @@
 
     // Value
     qs.setValue = function (arrValue, opts) {
-      if (!arrValue) return;
+      if (!arrValue || arrValue.length <= 0) return;
 
-      if (arrValue.length > 0) qs.clear(opts);
-
+      qs.clear(opts);
       $.each(arrValue, function (i, value) {
         qs.selectedMap.put(value.code || value.c, value);
         if (qs.loaded) {
